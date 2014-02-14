@@ -26,6 +26,25 @@ class GameStateTest extends Specification {
         SURROUNDED_BY_EXPLOSION          || [LEFT, RIGHT, UP, DOWN, STOP, ACT]
     }
 
+    def "generate successor for illegal actions"() {
+        when:
+        GameState state = new GameState(BOMBER_LEFT_UP_CORNER)
+        state.generateSuccessor(LEFT)
+
+        then:
+        thrown(IllegalArgumentException)
+    }
+
+    def "generate bomberman successor"() {
+        when:
+        GameState state = new GameState(BOMBER_LEFT_UP_CORNER)
+        GameState newState = state.generateSuccessor(RIGHT)
+
+        then:
+        assert newState.bomber.x == 2
+        assert newState.bomber.y == 1
+    }
+
     public static final String BOMBER_LEFT_UP_CORNER = """
 ☼☼☼☼
 ☼☺ ☼

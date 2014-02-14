@@ -12,12 +12,19 @@ import static com.codenjoy.bomberman.utils.Point.*;
  * User: oleksandr.baglai
  */
 public class Board {
-    private String board;
+    public String board;
     private LengthToXY xyl;
     private int size;
 
     public Board(String boardString) {
-        board = boardString.replaceAll("\n", "");
+        this(boardString, false);
+    }
+
+    public Board(String boardString, boolean oneLine) {
+        board = boardString;
+        if (!oneLine) {
+            board = boardString.replaceAll("\n", "");
+        }
         size = boardSize();
         xyl = new LengthToXY(size);
     }
