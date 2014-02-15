@@ -1,5 +1,6 @@
 package com.codenjoy.bomberman
 
+import com.codenjoy.bomberman.utils.LengthToXY
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -15,15 +16,15 @@ class GameStateTest extends Specification {
         (expectedActions - state.legalActions).empty
 
         where:
-        board                       || expectedActions
-        BOMBER_LEFT_UP_CORNER       || [RIGHT, DOWN, STOP, ACT]
-        BOMER_DOWN_RIGHT_CORNER     || [UP, LEFT, STOP, ACT]
-        BOMB_BOMBER                 || [UP, LEFT, STOP, ACT]
-        SURROUNDED_BY_OTHER             || [STOP, ACT]
-        SURROUNDED_BY_WALLS             || [LEFT, STOP, ACT]
-        SURROUNDED_BY_CHOPPERS          || [UP, STOP, ACT]
-        SURROUNDED_BY_BOMBS          || [LEFT, RIGHT, UP, DOWN, STOP, ACT]
-        SURROUNDED_BY_EXPLOSION          || [LEFT, RIGHT, UP, DOWN, STOP, ACT]
+        board                   || expectedActions
+        BOMBER_LEFT_UP_CORNER   || [RIGHT, DOWN, STOP, ACT]
+        BOMER_DOWN_RIGHT_CORNER || [UP, LEFT, STOP, ACT]
+        BOMB_BOMBER             || [UP, LEFT, STOP, ACT]
+        SURROUNDED_BY_OTHER     || [STOP, ACT]
+        SURROUNDED_BY_WALLS     || [LEFT, STOP, ACT]
+        SURROUNDED_BY_CHOPPERS  || [UP, STOP, ACT]
+        SURROUNDED_BY_BOMBS     || [LEFT, RIGHT, UP, DOWN, STOP, ACT]
+        SURROUNDED_BY_EXPLOSION || [LEFT, RIGHT, UP, DOWN, STOP, ACT]
     }
 
     def "generate successor for illegal actions"() {
@@ -42,10 +43,10 @@ class GameStateTest extends Specification {
         assert "$newState.bomber" == expectedPosition
 
         where:
-        initState               | action || expectedPosition
-        BOMBER_LEFT_UP_CORNER   | RIGHT  || '[2,1]'
-        BOMBER_LEFT_UP_CORNER   | DOWN  || '[1,2]'
-        BOMB_BOMBER   | UP || '[2,1]'
+        initState             | action || expectedPosition
+        BOMBER_LEFT_UP_CORNER | RIGHT  || '[2,1]'
+        BOMBER_LEFT_UP_CORNER | DOWN   || '[1,2]'
+        BOMB_BOMBER           | UP     || '[2,1]'
     }
 
     def "generate successor (act)"() {
@@ -55,6 +56,29 @@ class GameStateTest extends Specification {
 
         then:
         assert "$newState.bomber" == "[2,1]"
+        assert newState.at(1,1) == Element.BOMB_TIMER_4
+    }
+
+    def "generate successor (bomb timer)"() {
+        def point = new LengthToXY(9).getLength(4, 4)
+        def chars = emptyBoard(7).chars
+        chars[point] = '☺'
+        def board = new String(chars)
+        println "board = $board"
+        def state = new GameState(board, true)
+
+        when:
+        state.generateSuccessor(ACT)
+
+        then:
+        assert 1 == 1
+    }
+
+    private static def emptyBoard(int size) {
+        String result = '☼'*(size + 2)
+        size.times {result+='☼'+' '*size+'☼'}
+        result+='☼'*(size + 2)
+        result
     }
 
     public static final String BOMBER_LEFT_UP_CORNER = """
