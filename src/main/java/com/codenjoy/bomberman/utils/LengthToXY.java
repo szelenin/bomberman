@@ -20,4 +20,8 @@ public class LengthToXY {
     public int getLength(int x, int y) {
         return (y)*boardSize + x;
     }
+
+    public int getLength(Point point) {
+        return (point.getY())*boardSize + point.getX();
+    }
 }

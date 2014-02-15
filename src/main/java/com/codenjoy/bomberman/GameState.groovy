@@ -41,14 +41,20 @@ class GameState {
         if (!legalActions.contains(action)) {
             throw new IllegalArgumentException("Can't do $action!")
         }
-
-        int bomberCharAt = toXY.getLength(board.bomberman.x, board.bomberman.y)
-        int newBomberCharAt = toXY.getLength(action.changeX(board.bomberman.x), action.changeY(board.bomberman.y))
         char[] boardChars = board.board.toCharArray()
 
+        int bomberCharAt = toXY.getLength(board.bomberman)
+        int newBomberCharAt = toXY.getLength(action.changeX(board.bomberman.x), action.changeY(board.bomberman.y))
+
         char currentBomberChar = boardChars[bomberCharAt]
-        boardChars[bomberCharAt] = currentBomberChar == BOMB_BOMBERMAN.char ? BOMB_TIMER_4.char : SPACE.char
+        boardChars[bomberCharAt] = currentBomberChar == BOMB_BOMBERMAN.char ? BOMB_TIMER_5.char : SPACE.char
         boardChars[newBomberCharAt] = bomberManChar(action)
+
+        for (bomb in board.bombs) {
+            char bombChar = boardChars[toXY.getLength(bomb)]
+            bombChar--
+            boardChars[toXY.getLength(bomb)] = bombChar
+        }
 
         def state = new GameState(new String(boardChars), true)
         state

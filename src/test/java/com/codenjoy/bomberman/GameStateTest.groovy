@@ -49,29 +49,29 @@ class GameStateTest extends Specification {
         BOMB_BOMBER           | UP     || '[2,1]'
     }
 
-    def "generate successor (act)"() {
-        GameState state = new GameState(BOMBER_LEFT_UP_CORNER)
-        when:
-        def newState = state.generateSuccessor(ACT).generateSuccessor(RIGHT)
 
-        then:
-        assert "$newState.bomber" == "[2,1]"
-        assert newState.at(1,1) == Element.BOMB_TIMER_4
+    def "generate successor (bomb timer)"(List<Action> actions, Element expectedTimer, String bomberAt) {
+        def state = new GameState(createBoardWithBomberAt(4, 4, 7), true).generateSuccessor(ACT)
+        actions.each {action->state = state.generateSuccessor(action)}
+        expect:
+        assert state.at(4,4) == expectedTimer
+        assert "$state.bomber" == bomberAt
+
+        where:
+        actions || expectedTimer | bomberAt
+        [RIGHT] || Element.BOMB_TIMER_4 | '[5,4]'
+        [LEFT, LEFT] || Element.BOMB_TIMER_3 | '[2,4]'
+        [LEFT, LEFT, LEFT] || Element.BOMB_TIMER_2 | '[1,4]'
+        [LEFT, LEFT, LEFT, DOWN] || Element.BOMB_TIMER_1 | '[1,5]'
     }
 
-    def "generate successor (bomb timer)"() {
-        def point = new LengthToXY(9).getLength(4, 4)
-        def chars = emptyBoard(7).chars
+    private String createBoardWithBomberAt(int x, int y, int width) {
+        def point = new LengthToXY(9).getLength(x, y)
+
+        def chars = emptyBoard(width).chars
         chars[point] = '☺'
         def board = new String(chars)
-        println "board = $board"
-        def state = new GameState(board, true)
-
-        when:
-        state.generateSuccessor(ACT)
-
-        then:
-        assert 1 == 1
+        board
     }
 
     private static def emptyBoard(int size) {
