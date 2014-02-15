@@ -51,9 +51,7 @@ class GameState {
         boardChars[newBomberCharAt] = bomberManChar(action)
 
         for (bomb in board.bombs) {
-            char bombChar = boardChars[toXY.getLength(bomb)]
-            bombChar--
-            boardChars[toXY.getLength(bomb)] = bombChar
+            boardChars[toXY.getLength(bomb)]--
         }
 
         def state = new GameState(new String(boardChars), true)
