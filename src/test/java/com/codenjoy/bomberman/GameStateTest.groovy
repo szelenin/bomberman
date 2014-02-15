@@ -35,14 +35,26 @@ class GameStateTest extends Specification {
         thrown(IllegalArgumentException)
     }
 
-    def "generate bomberman successor"() {
-        when:
+    def "generate successor (move)"(String initState, Action action, String expectedPosition) {
+        GameState state = new GameState(initState)
+        GameState newState = state.generateSuccessor(action)
+        expect:
+        assert "$newState.bomber" == expectedPosition
+
+        where:
+        initState               | action || expectedPosition
+        BOMBER_LEFT_UP_CORNER   | RIGHT  || '[2,1]'
+        BOMBER_LEFT_UP_CORNER   | DOWN  || '[1,2]'
+        BOMB_BOMBER   | UP || '[2,1]'
+    }
+
+    def "generate successor (act)"() {
         GameState state = new GameState(BOMBER_LEFT_UP_CORNER)
-        GameState newState = state.generateSuccessor(RIGHT)
+        when:
+        def newState = state.generateSuccessor(ACT).generateSuccessor(RIGHT)
 
         then:
-        assert newState.bomber.x == 2
-        assert newState.bomber.y == 1
+        assert "$newState.bomber" == "[2,1]"
     }
 
     public static final String BOMBER_LEFT_UP_CORNER = """
