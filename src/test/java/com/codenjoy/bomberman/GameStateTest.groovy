@@ -50,34 +50,46 @@ class GameStateTest extends Specification {
     }
 
 
+    @Unroll
     def "generate successor (bomb timer)"(List<Action> actions, Element expectedTimer, String bomberAt) {
         def state = new GameState(createBoardWithBomberAt(4, 4, 7), true).generateSuccessor(ACT)
-        actions.each {action->state = state.generateSuccessor(action)}
+        actions.each { action -> state = state.generateSuccessor(action) }
         expect:
-        assert state.at(4,4) == expectedTimer
+        assert state.at(4, 4) == expectedTimer
         assert "$state.bomber" == bomberAt
 
         where:
-        actions || expectedTimer | bomberAt
-        [RIGHT] || Element.BOMB_TIMER_4 | '[5,4]'
-        [LEFT, LEFT] || Element.BOMB_TIMER_3 | '[2,4]'
-        [LEFT, LEFT, LEFT] || Element.BOMB_TIMER_2 | '[1,4]'
+        actions                  || expectedTimer | bomberAt
+        [RIGHT]                  || Element.BOMB_TIMER_4 | '[5,4]'
+        [LEFT, LEFT]             || Element.BOMB_TIMER_3 | '[2,4]'
+        [LEFT, LEFT, LEFT]       || Element.BOMB_TIMER_2 | '[1,4]'
         [LEFT, LEFT, LEFT, DOWN] || Element.BOMB_TIMER_1 | '[1,5]'
     }
 
-    private String createBoardWithBomberAt(int x, int y, int width) {
-        def point = new LengthToXY(9).getLength(x, y)
+    def "generate successor (boom)"() {
+        def state = new GameState(createBoardWithBomberAt(5, 5, 9), true).generateSuccessor(ACT)
+        4.times { state = state.generateSuccessor(LEFT) }
+        when:
+        GameState boomState = state.generateSuccessor(DOWN)
+        then:
+        (-3..3).each{ it -> assert boomState.at(5 + it, 5) == Element.BOOM }
+        (-3..3).each{ it -> assert boomState.at(5, 5 + it) == Element.BOOM }
+    }
+
+
+    private static String createBoardWithBomberAt(int x, int y, int width) {
+        def point = new LengthToXY(width).getLength(x, y)
 
         def chars = emptyBoard(width).chars
-        chars[point] = '☺'
+        chars[point + width + 1] = '☺'
         def board = new String(chars)
         board
     }
 
     private static def emptyBoard(int size) {
-        String result = '☼'*(size + 2)
-        size.times {result+='☼'+' '*size+'☼'}
-        result+='☼'*(size + 2)
+        String result = '☼' * (size + 2)
+        size.times { result += '☼' + ' ' * size + '☼' }
+        result += '☼' * (size + 2)
         result
     }
 

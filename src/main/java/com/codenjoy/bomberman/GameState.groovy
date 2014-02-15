@@ -51,7 +51,14 @@ class GameState {
         boardChars[newBomberCharAt] = bomberManChar(action)
 
         for (bomb in board.bombs) {
-            boardChars[toXY.getLength(bomb)]--
+            int bombPosition = toXY.getLength(bomb)
+            boardChars[bombPosition] = ((boardChars[bombPosition] as int) - 1) as char
+            if (boardChars[bombPosition] == '0') {
+                (-3..3).each {it->
+                    boardChars[toXY.getLength(bomb.x + it, bomb.y)] = BOOM.char
+                    boardChars[toXY.getLength(bomb.x, bomb.y + it)] = BOOM.char
+                }
+            }
         }
 
         def state = new GameState(new String(boardChars), true)
@@ -72,5 +79,10 @@ class GameState {
 
     def at(int x, int y) {
         board.getAt(x, y)
+    }
+
+    @Override
+    String toString() {
+        return board.toString()
     }
 }
