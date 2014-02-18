@@ -3,20 +3,27 @@ package com.codenjoy.bomberman
 import com.codenjoy.bomberman.utils.Board
 import com.codenjoy.bomberman.utils.LengthToXY
 import com.codenjoy.bomberman.utils.Point
+import it.unimi.dsi.fastutil.chars.Char2LongOpenHashMap
 
 import static com.codenjoy.bomberman.Element.*
 
 /**
  * Created by szelenin on 2/11/14.
  */
-class GameState {
+class GameStateOld {
     private Board board
     private canMoveElements = [SPACE, BOMBERMAN, BOMB_BOMBERMAN, DESTROYED_WALL, DEAD_MEAT_CHOPPER,
             BOMB_TIMER_1, BOMB_TIMER_2, BOMB_TIMER_3, BOMB_TIMER_4, BOMB_TIMER_5,
             DEAD_BOMBERMAN, BOOM, OTHER_DEAD_BOMBERMAN]
     private LengthToXY toXY
+    private Char2LongOpenHashMap elements = new Char2LongOpenHashMap(Element.values().length)
 
-    GameState(String board, boolean oneLine = false) {
+    GameStateOld(String board, boolean oneLine = false) {
+        for (int i = 0; i < board.length(); i++) {
+            char elementChar = board.charAt(i)
+            long values = elements.get(elementChar)
+            println "values = $values"
+        }
         this.board = new Board(board, oneLine)
         toXY = new LengthToXY(this.board.boardSize())
         this.board
@@ -84,5 +91,9 @@ class GameState {
     @Override
     String toString() {
         return board.toString()
+    }
+
+    boolean isDead() {
+        false
     }
 }

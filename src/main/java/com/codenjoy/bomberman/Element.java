@@ -61,4 +61,8 @@ public enum Element {
         }
         throw new IllegalArgumentException("No such Elment for " + ch);
     }
+
+    public static void main(String[] args) {
+        System.out.println("Element.values().length = " + Element.values().length);
+    }
 }

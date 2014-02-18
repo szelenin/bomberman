@@ -72,9 +72,25 @@ class GameStateTest extends Specification {
         when:
         GameState boomState = state.generateSuccessor(DOWN)
         then:
-        (-3..3).each{ it -> assert boomState.at(5 + it, 5) == Element.BOOM }
-        (-3..3).each{ it -> assert boomState.at(5, 5 + it) == Element.BOOM }
+        (-3..3).each { it -> assert boomState.at(5 + it, 5) == Element.BOOM }
+        (-3..3).each { it -> assert boomState.at(5, 5 + it) == Element.BOOM }
     }
+
+/*
+    def "generate successor (boomed bomber)"() {
+        def state = new GameState(createBoardWithBomberAt(5, 5, 9), true).generateSuccessor(ACT)
+        state.generateSuccessor(STOP)
+        4.times { it ->
+            println "state = $state"
+            state = state.generateSuccessor(STOP)
+        }
+        when:
+        GameState boomState = state.generateSuccessor(STOP)
+        then:
+        assert boomState.at(5, 5) == Element.DEAD_BOMBERMAN
+        assert boomState.dead
+    }
+*/
 
 
     private static String createBoardWithBomberAt(int x, int y, int width) {
