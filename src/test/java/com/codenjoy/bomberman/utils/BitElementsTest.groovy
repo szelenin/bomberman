@@ -1,6 +1,7 @@
 package com.codenjoy.bomberman.utils
 
 import spock.lang.Specification
+import spock.lang.Unroll
 
 /**
  * Created by szelenin on 2/18/14.
@@ -31,5 +32,15 @@ class BitElementsTest extends Specification {
         assert elements.getBit(2 * 8 + 3 - 1)
         assert !elements.getBit(2 * 8)
     }
+
+    def "setBit higher byte bug"() {
+        BitElements elements = new BitElements(2 * 5)
+        when:
+        elements.setBit(0)
+        then:
+        assert elements.getBit(0)
+        assert !elements.getBit(7)
+    }
+
 
 }

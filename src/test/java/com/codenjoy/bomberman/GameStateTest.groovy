@@ -22,7 +22,7 @@ class GameStateTest extends Specification {
         BOMB_BOMBER             || [UP, LEFT, STOP, ACT]
         SURROUNDED_BY_OTHER     || [STOP, ACT]
         SURROUNDED_BY_WALLS     || [LEFT, STOP, ACT]
-        SURROUNDED_BY_CHOPPERS  || [UP, STOP, ACT]
+        SURROUNDED_BY_CHOPPERS  || [UP, LEFT, STOP, ACT]
         SURROUNDED_BY_BOMBS     || [LEFT, RIGHT, UP, DOWN, STOP, ACT]
         SURROUNDED_BY_EXPLOSION || [LEFT, RIGHT, UP, DOWN, STOP, ACT]
     }

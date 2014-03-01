@@ -4,11 +4,8 @@ import com.codenjoy.bomberman.utils.BitElements;
 import com.codenjoy.bomberman.utils.Board;
 import com.codenjoy.bomberman.utils.LengthToXY;
 import com.codenjoy.bomberman.utils.Point;
-import it.unimi.dsi.fastutil.chars.Char2LongOpenHashMap;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static com.codenjoy.bomberman.Element.*;
 
@@ -33,21 +30,24 @@ public class GameState {
         this(board, false);
     }
 
-    public GameState(String board, boolean oneLine) {
+    public GameState(String boardString, boolean oneLine) {
+        if (!oneLine) {
+            boardString = boardString.replaceAll("\n", "");
+        }
         List<Character> bomberStates = Arrays.asList(BOMBERMAN.getChar(), BOMB_BOMBERMAN.getChar(), DEAD_BOMBERMAN.getChar());
         List<Character> chopperStates = Arrays.asList(MEAT_CHOPPER.getChar(), DEAD_MEAT_CHOPPER.getChar());
         List<Character> otherBombers = Arrays.asList(OTHER_BOMBERMAN.getChar(), OTHER_BOMB_BOMBERMAN.getChar(), OTHER_DEAD_BOMBERMAN.getChar());
         for (int i = 0; i < 3; i++) {
-            walls[i] = new BitElements(board.length());
+            walls[i] = new BitElements(boardString.length());
         }
 
-        this.board = new Board(board, oneLine);
+        this.board = new Board(boardString, oneLine);
         toXY = new LengthToXY(this.board.boardSize());
-        for (int i = 0; i < board.length(); i++) {
+        for (int i = 0; i < boardString.length(); i++) {
             Point currentPosition = toXY.getXY(i);
-            char elementChar = board.charAt(i);
+            char elementChar = boardString.charAt(i);
             int wallPosition = wallPosition(elementChar);
-            if (wallPosition > 0) {
+            if (wallPosition >= 0) {
                 walls[wallPosition].setBit(i);
                 continue;
             }
@@ -86,23 +86,36 @@ public class GameState {
     }
 
     public List<Action> getLegalActions() {
-        List<Action> result = new ArrayList<Action>();
+        ArrayList<Action> result = new ArrayList<Action>(Arrays.asList(Action.values()));
+
         for (Action action : Action.values()) {
-            int x = action.changeX(board.getBomberman().getX());
-            int y = action.changeY(board.getBomberman().getY());
-
-            Element element = board.getAt(x, y);
-
-            if (canMoveElements.contains(element)) {
-                result.add(action);
+            int x = action.changeX(bomber.position.getX());
+            int y = action.changeY(bomber.position.getY());
+            int bitNo = toXY.getLength(x, y);
+            for (int i = 0; i < 2; i++) {
+                if (walls[i].getBit(bitNo)) {
+                    result.remove(action);
+                }
+                if (onOtherBomber(x, y)) {
+                    result.remove(action);
+                }
             }
         }
         return result;
     }
 
+    private boolean onOtherBomber(int x, int y) {
+        for (BomberState otherBomber : otherBombers) {
+            if (otherBomber.position.getX() == x && otherBomber.position.getY() == y && !otherBomber.isDead()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public GameState generateSuccessor(Action action) {
         if (!getLegalActions().contains(action)) {
-            throw new IllegalArgumentException("Can't do $action!");
+            throw new IllegalArgumentException("Can't do " + action.name());
         }
         char[] boardChars = board.board.toCharArray();
 
@@ -118,7 +131,7 @@ public class GameState {
             char boardChar = boardChars[bombPosition];
             boardChars[bombPosition] = (char) (boardChar - 1);
             if (boardChars[bombPosition] == '0') {
-                for (int i = -3; i <= 3;i++) {
+                for (int i = -3; i <= 3; i++) {
                     boardChars[toXY.getLength(bomb.getX() + i, bomb.getY())] = BOOM.getChar();
                     boardChars[toXY.getLength(bomb.getX(), bomb.getY() + i)] = BOOM.getChar();
                 }
@@ -151,12 +164,16 @@ public class GameState {
     }
 
     private class BomberState {
-        private final Point position;
-        private final Element state;
+        public final Point position;
+        public final Element state;
 
         private BomberState(Point position, Element state) {
             this.position = position;
             this.state = state;
+        }
+
+        public boolean isDead() {
+            return state == Element.OTHER_DEAD_BOMBERMAN;
         }
     }
 }

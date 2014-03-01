@@ -12,11 +12,15 @@ public class BitElements {
         bytes = new byte[size / 8 + 1];
     }
 
+    public void setBit(int x, int y) {
+        setBit(y * size + x);
+    }
+
     public void setBit(int bitNo) {
         if (bitNo > size - 1) {
             throw new IllegalArgumentException("Bit out of range " + bitNo);
         }
-        bytes[position(bitNo)] |= 0x81 >> bitNo % 8;
+        bytes[position(bitNo)] |= 0x80 >> bitNo % 8;
     }
 
     private int position(int bitNo) {
@@ -25,5 +29,9 @@ public class BitElements {
 
     public boolean getBit(int bitNo) {
         return (bytes[position(bitNo)] & 0x81 >> bitNo % 8) > 0;
+    }
+
+    public boolean getBit(int x, int y) {
+        return getBit(y * size + x);
     }
 }
