@@ -28,10 +28,20 @@ public class BitElements {
     }
 
     public boolean getBit(int bitNo) {
-        return (bytes[position(bitNo)] & 0x81 >> bitNo % 8) > 0;
+        return (bytes[position(bitNo)] & 0x80 >> bitNo % 8) > 0;
     }
 
     public boolean getBit(int x, int y) {
         return getBit(y * size + x);
+    }
+
+    public int getSize() {
+        return size;
+    }
+
+    public BitElements getCopy() {
+        BitElements bitElements = new BitElements(size);
+        System.arraycopy(this.bytes, 0, bitElements.bytes, 0, bitElements.bytes.length);
+        return bitElements;
     }
 }

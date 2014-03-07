@@ -9,22 +9,18 @@ import java.util.*;
 
 import static com.codenjoy.bomberman.Element.*;
 
-/**
- * Created by szelenin on 2/18/14.
- */
 public class GameState {
-    private final Board board;
-    private final List<BomberState> otherBombers = new ArrayList<BomberState>();
+    private List<BomberState> bombs = new ArrayList<BomberState>();
+    //    private final Board board;
+    private List<BomberState> otherBombers = new ArrayList<BomberState>();
     private List<BomberState> choppers = new ArrayList<BomberState>();
+    private List<BomberState> explosion = new ArrayList<BomberState>();
+
     private BomberState bomber;
 
     private LengthToXY toXY;
     //0-WALL, 1-DESTROY_WALL, 2-DESTROYED_WALL
     private BitElements[] walls = new BitElements[3];
-
-    private List<Element> canMoveElements = Arrays.asList(SPACE, BOMBERMAN, BOMB_BOMBERMAN, DESTROYED_WALL, DEAD_MEAT_CHOPPER,
-            BOMB_TIMER_1, BOMB_TIMER_2, BOMB_TIMER_3, BOMB_TIMER_4, BOMB_TIMER_5,
-            DEAD_BOMBERMAN, BOOM, OTHER_DEAD_BOMBERMAN);
 
     public GameState(String board) {
         this(board, false);
@@ -37,12 +33,13 @@ public class GameState {
         List<Character> bomberStates = Arrays.asList(BOMBERMAN.getChar(), BOMB_BOMBERMAN.getChar(), DEAD_BOMBERMAN.getChar());
         List<Character> chopperStates = Arrays.asList(MEAT_CHOPPER.getChar(), DEAD_MEAT_CHOPPER.getChar());
         List<Character> otherBombers = Arrays.asList(OTHER_BOMBERMAN.getChar(), OTHER_BOMB_BOMBERMAN.getChar(), OTHER_DEAD_BOMBERMAN.getChar());
+        List<Character> bombs = Arrays.asList(BOMB_TIMER_5.getChar(), BOMB_TIMER_4.getChar(), BOMB_TIMER_3.getChar(), BOMB_TIMER_2.getChar(), BOMB_TIMER_1.getChar(), BOOM.getChar());
         for (int i = 0; i < 3; i++) {
             walls[i] = new BitElements(boardString.length());
         }
 
-        this.board = new Board(boardString, oneLine);
-        toXY = new LengthToXY(this.board.boardSize());
+        Board board = new Board(boardString, oneLine);
+        toXY = new LengthToXY(board.boardSize());
         for (int i = 0; i < boardString.length(); i++) {
             Point currentPosition = toXY.getXY(i);
             char elementChar = boardString.charAt(i);
@@ -67,8 +64,32 @@ public class GameState {
                 continue;
             }
 
+            if (bombs.contains(elementChar)) {
+                this.bombs.add(new BomberState(currentPosition, Element.valueOf(elementChar)));
+            }
         }
 
+    }
+
+    public GameState(GameState gameState) {
+        this.otherBombers = new ArrayList<BomberState>();
+        for (BomberState otherBomber : gameState.otherBombers) {
+            this.otherBombers.add(otherBomber.getCopy());
+        }
+        this.bomber = gameState.bomber.getCopy();
+        this.choppers = new ArrayList<BomberState>();
+        for (BomberState chopper : gameState.choppers) {
+            choppers.add(chopper.getCopy());
+        }
+        for (BomberState bomb : gameState.bombs) {
+            bombs.add(bomb.getCopy());
+        }
+
+        this.walls = gameState.walls.clone();
+        for (int i = 0; i < walls.length; i++) {
+            walls[i] = gameState.walls[i].getCopy();
+        }
+        toXY = new LengthToXY((int) Math.sqrt(gameState.walls[0].getSize()));
     }
 
 
@@ -117,55 +138,79 @@ public class GameState {
         if (!getLegalActions().contains(action)) {
             throw new IllegalArgumentException("Can't do " + action.name());
         }
-        char[] boardChars = board.board.toCharArray();
 
-        int bomberCharAt = toXY.getLength(board.getBomberman());
-        int newBomberCharAt = toXY.getLength(action.changeX(board.getBomberman().getX()), action.changeY(board.getBomberman().getY()));
+        GameState newGameState = new GameState(this);
+        newGameState.bomber.move(action);
+        Iterator<BomberState> iterator = newGameState.bombs.iterator();
+        while (iterator.hasNext()) {
+            BomberState bomb = iterator.next();
 
-        char currentBomberChar = boardChars[bomberCharAt];
-        boardChars[bomberCharAt] = currentBomberChar == BOMB_BOMBERMAN.getChar() ? BOMB_TIMER_5.getChar() : SPACE.getChar();
-        boardChars[newBomberCharAt] = bomberManChar(action);
-
-        for (Point bomb : board.getBombs()) {
-            int bombPosition = toXY.getLength(bomb);
-            char boardChar = boardChars[bombPosition];
-            boardChars[bombPosition] = (char) (boardChar - 1);
-            if (boardChars[bombPosition] == '0') {
+        }
+        for (BomberState bomb : newGameState.bombs) {
+            bomb.changeState(Element.values()[bomb.state.ordinal() + 1]);
+            if (bomb.state == Element.BOOM) {
                 for (int i = -3; i <= 3; i++) {
-                    boardChars[toXY.getLength(bomb.getX() + i, bomb.getY())] = BOOM.getChar();
-                    boardChars[toXY.getLength(bomb.getX(), bomb.getY() + i)] = BOOM.getChar();
+                    int x = bomb.position.getX() + i;
+                    Element elementByX = newGameState.at(x, bomb.position.getY());
+                    if (elementByX != Element.WALL) {
+                        newGameState.explosion.add(new BomberState(new Point(x, bomb.position.getY()), BOOM));
+                    }
+                    int y = bomb.position.getX() + i;
+                    Element elementByY = newGameState.at(bomb.position.getX(), y);
+                    if (elementByY != Element.WALL) {
+                        newGameState.explosion.add(new BomberState(new Point(bomb.position.getX(), y), BOOM));
+                    }
                 }
             }
         }
-
-        return new GameState(new String(boardChars), true);
-
-    }
-
-    private char bomberManChar(Action action) {
-        char bomberChar = BOMBERMAN.getChar();
         if (action == Action.ACT) {
-            bomberChar = BOMB_BOMBERMAN.getChar();
+            newGameState.bombs.add(new BomberState(bomber.position, BOMB_TIMER_5));
         }
-        return bomberChar;
+        return newGameState;
+
     }
 
     Point getBomber() {
-        return board.getBomberman();
+        return bomber.position;
     }
 
     Element at(int x, int y) {
-        return board.getAt(x, y);
-    }
+        for (BomberState chopper : choppers) {
+            if (x == chopper.position.getX() && y == chopper.position.getY()) {
+                return chopper.state;
+            }
+        }
+        for (BomberState otherBomber : otherBombers) {
+            if (x == otherBomber.position.getX() && y == otherBomber.position.getY()) {
+                return otherBomber.state;
+            }
+        }
+        for (BomberState bomb : bombs) {
+            if (x == bomb.position.getX() && y == bomb.position.getY()) {
+                return bomb.state;
+            }
+        }
+        for (BomberState boom : explosion) {
+            if (x == boom.position.getX() && y == boom.position.getY()) {
+                return boom.state;
+            }
+        }
 
-    @Override
-    public String toString() {
-        return board.toString();
+        int bitNo = toXY.getLength(x, y);
+        for (int i = 0; i < 3; i++) {
+            if (walls[i].getBit(bitNo)) {
+                return Element.values()[Element.WALL.ordinal() + i];
+            }
+        }
+        if (bomber.position.getX() == x && bomber.position.getY() == y) {
+            return bomber.state;
+        }
+        return Element.SPACE;
     }
 
     private class BomberState {
-        public final Point position;
-        public final Element state;
+        public Point position;
+        public Element state;
 
         private BomberState(Point position, Element state) {
             this.position = position;
@@ -174,6 +219,18 @@ public class GameState {
 
         public boolean isDead() {
             return state == Element.OTHER_DEAD_BOMBERMAN;
+        }
+
+        public void move(Action action) {
+            this.position = new Point(action.changeX(position.getX()), action.changeY(position.getY()));
+        }
+
+        public BomberState getCopy() {
+            return new BomberState(new Point(position), state);
+        }
+
+        public void changeState(Element newState) {
+            this.state = newState;
         }
     }
 }

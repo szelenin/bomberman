@@ -1,5 +1,7 @@
 package com.codenjoy.bomberman.utils;
 
+import com.codenjoy.bomberman.Action;
+
 /**
  * User: oleksandr.baglai
  */
@@ -42,4 +44,6 @@ public class Point {
     public int getY() {
         return y;
     }
+
+
 }
