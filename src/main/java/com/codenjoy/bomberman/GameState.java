@@ -10,13 +10,12 @@ import java.util.*;
 import static com.codenjoy.bomberman.Element.*;
 
 public class GameState {
-    private List<BomberState> bombs = new ArrayList<BomberState>();
-    //    private final Board board;
-    private List<BomberState> otherBombers = new ArrayList<BomberState>();
-    private List<BomberState> choppers = new ArrayList<BomberState>();
-    private List<BomberState> explosion = new ArrayList<BomberState>();
+    private List<ElementState> bombs = new ArrayList<ElementState>();
+    private List<ElementState> otherBombers = new ArrayList<ElementState>();
+    private List<ElementState> choppers = new ArrayList<ElementState>();
+    private List<ElementState> explosion = new ArrayList<ElementState>();
 
-    private BomberState bomber;
+    private ElementState bomber;
 
     private LengthToXY toXY;
     //0-WALL, 1-DESTROY_WALL, 2-DESTROYED_WALL
@@ -25,6 +24,23 @@ public class GameState {
     public static final List<Character> OTHER_BOMBERS_SYMBOLS = Arrays.asList(OTHER_BOMBERMAN.getChar(), OTHER_BOMB_BOMBERMAN.getChar(), OTHER_DEAD_BOMBERMAN.getChar());
     public static final List<Character> CHOPPER_SYMBOLS = Arrays.asList(MEAT_CHOPPER.getChar(), DEAD_MEAT_CHOPPER.getChar());
     public static final List<Character> BOMBER_SYMBOLS = Arrays.asList(BOMBERMAN.getChar(), BOMB_BOMBERMAN.getChar(), DEAD_BOMBERMAN.getChar());
+    private static Map<Character, Elements> elementStates = new HashMap<Character, Elements>();
+
+    static {
+        for (Character symbol : BOMB_TIMER_SYMBOLS) {
+            elementStates.put(symbol, new BombTimers());
+        }
+        for (Character symbol : OTHER_BOMBERS_SYMBOLS) {
+            elementStates.put(symbol, new OtherBombers());
+        }
+        for (Character symbol : CHOPPER_SYMBOLS) {
+            elementStates.put(symbol, new Choppers());
+        }
+        for (Character symbol : BOMBER_SYMBOLS) {
+            elementStates.put(symbol, new Bomber());
+        }
+        elementStates.put(BOOM.getChar(), new Explosions());
+    }
 
     public GameState(String board) {
         this(board, false);
@@ -50,44 +66,25 @@ public class GameState {
                 continue;
             }
 
-            if (BOMBER_SYMBOLS.contains(elementChar)) {
-                this.bomber = new BomberState(currentPosition, Element.valueOf(elementChar));
+            Elements elements = elementStates.get(elementChar);
+            if (elements == null) {
                 continue;
             }
-
-            if (CHOPPER_SYMBOLS.contains(elementChar)) {
-                this.choppers.add(new BomberState(currentPosition, Element.valueOf(elementChar)));
-                continue;
-            }
-
-            if (OTHER_BOMBERS_SYMBOLS.contains(elementChar)) {
-                this.otherBombers.add(new BomberState(currentPosition, Element.valueOf(elementChar)));
-                continue;
-            }
-
-            if (BOMB_TIMER_SYMBOLS.contains(elementChar)) {
-                this.bombs.add(new BomberState(currentPosition, Element.valueOf(elementChar)));
-                continue;
-            }
-
-            if (Element.BOOM.getChar() == elementChar) {
-                this.explosion.add(new BomberState(currentPosition, Element.valueOf(elementChar)));
-            }
+            elements.add(new ElementState(currentPosition, Element.valueOf(elementChar)), this);
         }
-
     }
 
     public GameState(GameState gameState) {
-        this.otherBombers = new ArrayList<BomberState>();
-        for (BomberState otherBomber : gameState.otherBombers) {
+        this.otherBombers = new ArrayList<ElementState>();
+        for (ElementState otherBomber : gameState.otherBombers) {
             this.otherBombers.add(otherBomber.getCopy());
         }
         this.bomber = gameState.bomber.getCopy();
-        this.choppers = new ArrayList<BomberState>();
-        for (BomberState chopper : gameState.choppers) {
+        this.choppers = new ArrayList<ElementState>();
+        for (ElementState chopper : gameState.choppers) {
             choppers.add(chopper.getCopy());
         }
-        for (BomberState bomb : gameState.bombs) {
+        for (ElementState bomb : gameState.bombs) {
             bombs.add(bomb.getCopy());
         }
 
@@ -132,7 +129,7 @@ public class GameState {
     }
 
     private boolean onOtherBomber(int x, int y) {
-        for (BomberState otherBomber : otherBombers) {
+        for (ElementState otherBomber : otherBombers) {
             if (otherBomber.position.getX() == x && otherBomber.position.getY() == y && !otherBomber.isDead()) {
                 return true;
             }
@@ -151,14 +148,14 @@ public class GameState {
         tickAllBombs(newGameState);
 
         if (action == Action.ACT) {
-            newGameState.bombs.add(new BomberState(bomber.position, BOMB_TIMER_5));
+            newGameState.bombs.add(new ElementState(bomber.position, BOMB_TIMER_5));
         }
         return newGameState;
 
     }
 
     private void tickAllBombs(GameState newGameState) {
-        for (BomberState bomb : newGameState.bombs) {
+        for (ElementState bomb : newGameState.bombs) {
             bomb.changeState(Element.values()[bomb.state.ordinal() + 1]);
             if (bomb.state == Element.BOOM) {
                 explodeBomb(newGameState, bomb);
@@ -166,7 +163,7 @@ public class GameState {
         }
     }
 
-    private void explodeBomb(GameState newGameState, BomberState bomb) {
+    private void explodeBomb(GameState newGameState, ElementState bomb) {
         for (int i = -3; i <= 3; i++) {
             int x = bomb.position.getX() + i;
             int y = bomb.position.getX() + i;
@@ -178,7 +175,7 @@ public class GameState {
     private void addExplosionIfNoWall(GameState newGameState, int x, int oldY) {
         Element elementByX = newGameState.at(x, oldY);
         if (elementByX != Element.WALL) {
-            newGameState.explosion.add(new BomberState(new Point(x, oldY), BOOM));
+            newGameState.explosion.add(new ElementState(new Point(x, oldY), BOOM));
         }
     }
 
@@ -187,22 +184,22 @@ public class GameState {
     }
 
     Element at(int x, int y) {
-        for (BomberState chopper : choppers) {
+        for (ElementState chopper : choppers) {
             if (x == chopper.position.getX() && y == chopper.position.getY()) {
                 return chopper.state;
             }
         }
-        for (BomberState otherBomber : otherBombers) {
+        for (ElementState otherBomber : otherBombers) {
             if (x == otherBomber.position.getX() && y == otherBomber.position.getY()) {
                 return otherBomber.state;
             }
         }
-        for (BomberState bomb : bombs) {
+        for (ElementState bomb : bombs) {
             if (x == bomb.position.getX() && y == bomb.position.getY()) {
                 return bomb.state;
             }
         }
-        for (BomberState boom : explosion) {
+        for (ElementState boom : explosion) {
             if (x == boom.position.getX() && y == boom.position.getY()) {
                 return boom.state;
             }
@@ -221,29 +218,43 @@ public class GameState {
         return Element.SPACE;
     }
 
-    private class BomberState {
-        public Point position;
-        public Element state;
+    private interface Elements {
+        void add(ElementState elementState, GameState gameState);
+    }
 
-        private BomberState(Point position, Element state) {
-            this.position = position;
-            this.state = state;
+
+    private static class BombTimers implements Elements {
+        @Override
+        public void add(ElementState elementState, GameState gameState) {
+            gameState.bombs.add(elementState);
         }
+    }
 
-        public boolean isDead() {
-            return state == Element.OTHER_DEAD_BOMBERMAN;
+    private static class OtherBombers implements Elements {
+        @Override
+        public void add(ElementState elementState, GameState gameState) {
+            gameState.otherBombers.add(elementState);
         }
+    }
 
-        public void move(Action action) {
-            this.position = new Point(action.changeX(position.getX()), action.changeY(position.getY()));
+    private static class Choppers implements Elements {
+        @Override
+        public void add(ElementState elementState, GameState gameState) {
+            gameState.choppers.add(elementState);
         }
+    }
 
-        public BomberState getCopy() {
-            return new BomberState(new Point(position), state);
+    private static class Bomber implements Elements {
+        @Override
+        public void add(ElementState elementState, GameState gameState) {
+            gameState.bomber = elementState;
         }
+    }
 
-        public void changeState(Element newState) {
-            this.state = newState;
+    private static class Explosions implements Elements {
+        @Override
+        public void add(ElementState elementState, GameState gameState) {
+            gameState.explosion.add(elementState);
         }
     }
 }
