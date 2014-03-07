@@ -76,6 +76,13 @@ class GameStateTest extends Specification {
         (-3..3).each { it -> assert boomState.at(5, 5 + it) == Element.BOOM }
     }
 
+    def "init from string with BOOM"() {
+        when:
+        GameState state = new GameState(SURROUNDED_BY_EXPLOSION)
+        then:
+        assert state.at(3, 2) == Element.BOOM
+    }
+
 /*
     def "generate successor (boomed bomber)"() {
         def state = new GameState(createBoardWithBomberAt(5, 5, 9), true).generateSuccessor(ACT)

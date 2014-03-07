@@ -21,6 +21,10 @@ public class GameState {
     private LengthToXY toXY;
     //0-WALL, 1-DESTROY_WALL, 2-DESTROYED_WALL
     private BitElements[] walls = new BitElements[3];
+    public static final List<Character> BOMB_TIMER_SYMBOLS = Arrays.asList(BOMB_TIMER_5.getChar(), BOMB_TIMER_4.getChar(), BOMB_TIMER_3.getChar(), BOMB_TIMER_2.getChar(), BOMB_TIMER_1.getChar());
+    public static final List<Character> OTHER_BOMBERS_SYMBOLS = Arrays.asList(OTHER_BOMBERMAN.getChar(), OTHER_BOMB_BOMBERMAN.getChar(), OTHER_DEAD_BOMBERMAN.getChar());
+    public static final List<Character> CHOPPER_SYMBOLS = Arrays.asList(MEAT_CHOPPER.getChar(), DEAD_MEAT_CHOPPER.getChar());
+    public static final List<Character> BOMBER_SYMBOLS = Arrays.asList(BOMBERMAN.getChar(), BOMB_BOMBERMAN.getChar(), DEAD_BOMBERMAN.getChar());
 
     public GameState(String board) {
         this(board, false);
@@ -30,10 +34,7 @@ public class GameState {
         if (!oneLine) {
             boardString = boardString.replaceAll("\n", "");
         }
-        List<Character> bomberStates = Arrays.asList(BOMBERMAN.getChar(), BOMB_BOMBERMAN.getChar(), DEAD_BOMBERMAN.getChar());
-        List<Character> chopperStates = Arrays.asList(MEAT_CHOPPER.getChar(), DEAD_MEAT_CHOPPER.getChar());
-        List<Character> otherBombers = Arrays.asList(OTHER_BOMBERMAN.getChar(), OTHER_BOMB_BOMBERMAN.getChar(), OTHER_DEAD_BOMBERMAN.getChar());
-        List<Character> bombs = Arrays.asList(BOMB_TIMER_5.getChar(), BOMB_TIMER_4.getChar(), BOMB_TIMER_3.getChar(), BOMB_TIMER_2.getChar(), BOMB_TIMER_1.getChar(), BOOM.getChar());
+
         for (int i = 0; i < 3; i++) {
             walls[i] = new BitElements(boardString.length());
         }
@@ -49,23 +50,28 @@ public class GameState {
                 continue;
             }
 
-            if (bomberStates.contains(elementChar)) {
+            if (BOMBER_SYMBOLS.contains(elementChar)) {
                 this.bomber = new BomberState(currentPosition, Element.valueOf(elementChar));
                 continue;
             }
 
-            if (chopperStates.contains(elementChar)) {
+            if (CHOPPER_SYMBOLS.contains(elementChar)) {
                 this.choppers.add(new BomberState(currentPosition, Element.valueOf(elementChar)));
                 continue;
             }
 
-            if (otherBombers.contains(elementChar)) {
+            if (OTHER_BOMBERS_SYMBOLS.contains(elementChar)) {
                 this.otherBombers.add(new BomberState(currentPosition, Element.valueOf(elementChar)));
                 continue;
             }
 
-            if (bombs.contains(elementChar)) {
+            if (BOMB_TIMER_SYMBOLS.contains(elementChar)) {
                 this.bombs.add(new BomberState(currentPosition, Element.valueOf(elementChar)));
+                continue;
+            }
+
+            if (Element.BOOM.getChar() == elementChar) {
+                this.explosion.add(new BomberState(currentPosition, Element.valueOf(elementChar)));
             }
         }
 
@@ -141,33 +147,39 @@ public class GameState {
 
         GameState newGameState = new GameState(this);
         newGameState.bomber.move(action);
-        Iterator<BomberState> iterator = newGameState.bombs.iterator();
-        while (iterator.hasNext()) {
-            BomberState bomb = iterator.next();
 
-        }
-        for (BomberState bomb : newGameState.bombs) {
-            bomb.changeState(Element.values()[bomb.state.ordinal() + 1]);
-            if (bomb.state == Element.BOOM) {
-                for (int i = -3; i <= 3; i++) {
-                    int x = bomb.position.getX() + i;
-                    Element elementByX = newGameState.at(x, bomb.position.getY());
-                    if (elementByX != Element.WALL) {
-                        newGameState.explosion.add(new BomberState(new Point(x, bomb.position.getY()), BOOM));
-                    }
-                    int y = bomb.position.getX() + i;
-                    Element elementByY = newGameState.at(bomb.position.getX(), y);
-                    if (elementByY != Element.WALL) {
-                        newGameState.explosion.add(new BomberState(new Point(bomb.position.getX(), y), BOOM));
-                    }
-                }
-            }
-        }
+        tickAllBombs(newGameState);
+
         if (action == Action.ACT) {
             newGameState.bombs.add(new BomberState(bomber.position, BOMB_TIMER_5));
         }
         return newGameState;
 
+    }
+
+    private void tickAllBombs(GameState newGameState) {
+        for (BomberState bomb : newGameState.bombs) {
+            bomb.changeState(Element.values()[bomb.state.ordinal() + 1]);
+            if (bomb.state == Element.BOOM) {
+                explodeBomb(newGameState, bomb);
+            }
+        }
+    }
+
+    private void explodeBomb(GameState newGameState, BomberState bomb) {
+        for (int i = -3; i <= 3; i++) {
+            int x = bomb.position.getX() + i;
+            int y = bomb.position.getX() + i;
+            addExplosionIfNoWall(newGameState, x, bomb.position.getY());
+            addExplosionIfNoWall(newGameState, bomb.position.getX(), y);
+        }
+    }
+
+    private void addExplosionIfNoWall(GameState newGameState, int x, int oldY) {
+        Element elementByX = newGameState.at(x, oldY);
+        if (elementByX != Element.WALL) {
+            newGameState.explosion.add(new BomberState(new Point(x, oldY), BOOM));
+        }
     }
 
     Point getBomber() {
@@ -195,6 +207,7 @@ public class GameState {
                 return boom.state;
             }
         }
+
 
         int bitNo = toXY.getLength(x, y);
         for (int i = 0; i < 3; i++) {
