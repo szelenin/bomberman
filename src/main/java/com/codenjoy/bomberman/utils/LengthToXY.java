@@ -4,7 +4,7 @@ package com.codenjoy.bomberman.utils;
  * User: oleksandr.baglai
  */
 public class LengthToXY {
-    private int boardSize;
+    public final int boardSize;
 
     public LengthToXY(int boardSize) {
         this.boardSize = boardSize;

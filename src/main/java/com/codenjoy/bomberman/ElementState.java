@@ -3,8 +3,8 @@ package com.codenjoy.bomberman;
 import com.codenjoy.bomberman.utils.Point;
 
 /**
-* Created by szelenin on 3/7/14.
-*/
+ * Created by szelenin on 3/7/14.
+ */
 class ElementState {
     public Point position;
     public Element state;
@@ -15,7 +15,7 @@ class ElementState {
     }
 
     public boolean isDead() {
-        return state == Element.OTHER_DEAD_BOMBERMAN;
+        return state == Element.OTHER_DEAD_BOMBERMAN || state == Element.DEAD_BOMBERMAN;
     }
 
     public void move(Action action) {

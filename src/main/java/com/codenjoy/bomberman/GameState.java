@@ -155,10 +155,13 @@ public class GameState {
     }
 
     private void tickAllBombs(GameState newGameState) {
-        for (ElementState bomb : newGameState.bombs) {
+        Iterator<ElementState> iterator = newGameState.bombs.iterator();
+        while (iterator.hasNext()) {
+            ElementState bomb = iterator.next();
             bomb.changeState(Element.values()[bomb.state.ordinal() + 1]);
             if (bomb.state == Element.BOOM) {
                 explodeBomb(newGameState, bomb);
+                iterator.remove();
             }
         }
     }
@@ -172,10 +175,14 @@ public class GameState {
         }
     }
 
-    private void addExplosionIfNoWall(GameState newGameState, int x, int oldY) {
-        Element elementByX = newGameState.at(x, oldY);
-        if (elementByX != Element.WALL) {
-            newGameState.explosion.add(new ElementState(new Point(x, oldY), BOOM));
+    private void addExplosionIfNoWall(GameState newGameState, int x, int y) {
+        Element element = newGameState.at(x, y);
+        if (element != Element.WALL) {
+            newGameState.explosion.add(new ElementState(new Point(x, y), BOOM));
+        }
+        Point bomberPosition = newGameState.bomber.position;
+        if (bomberPosition.getX() == x && bomberPosition.getY() == y) {
+            newGameState.bomber.changeState(Element.DEAD_BOMBERMAN);
         }
     }
 
@@ -184,6 +191,9 @@ public class GameState {
     }
 
     Element at(int x, int y) {
+        if (bomber.position.getX() == x && bomber.position.getY() == y) {
+            return bomber.state;
+        }
         for (ElementState chopper : choppers) {
             if (x == chopper.position.getX() && y == chopper.position.getY()) {
                 return chopper.state;
@@ -212,10 +222,11 @@ public class GameState {
                 return Element.values()[Element.WALL.ordinal() + i];
             }
         }
-        if (bomber.position.getX() == x && bomber.position.getY() == y) {
-            return bomber.state;
-        }
         return Element.SPACE;
+    }
+
+    public boolean isDead() {
+        return bomber.isDead();
     }
 
     private interface Elements {
@@ -256,5 +267,17 @@ public class GameState {
         public void add(ElementState elementState, GameState gameState) {
             gameState.explosion.add(elementState);
         }
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (int y = 0; y < toXY.boardSize; y++) {
+            for (int x = 0; x < toXY.boardSize; x++) {
+                sb.append(at(x, y).getChar());
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
     }
 }
