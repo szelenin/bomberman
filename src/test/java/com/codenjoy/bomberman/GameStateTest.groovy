@@ -95,6 +95,25 @@ class GameStateTest extends Specification {
         assert boomState.dead
     }
 
+    def "generate successor (boomed chopper)"() {
+        def board = createBoardWithBomberAt(5, 5, 9)
+        board = setElement(board, 5, 5 + 1, 9, Element.MEAT_CHOPPER)
+        println "board = $board"
+        def state = new GameState(board, true).generateSuccessor(ACT)
+        4.times { it ->
+            state = state.generateSuccessor(STOP)
+        }
+        when:
+        GameState boomState = state.generateSuccessor(STOP)
+        then:
+        assert boomState.at(5, 5) == Element.DEAD_BOMBERMAN
+        assert boomState.dead
+    }
+
+    String setElement(String board, int x, int y, int width, Element element) {
+        int elementPosition = new LengthToXY(width).getLength(x, y)
+        return board.substring(0, elementPosition) + element.getChar() + board.substring(elementPosition + 1)
+    }
 
     private static String createBoardWithBomberAt(int x, int y, int width) {
         def point = new LengthToXY(width).getLength(x, y)
