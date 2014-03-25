@@ -184,6 +184,11 @@ public class GameState {
         if (bomberPosition.getX() == x && bomberPosition.getY() == y) {
             newGameState.bomber.changeState(Element.DEAD_BOMBERMAN);
         }
+        for (ElementState chopper : newGameState.choppers) {
+            if (chopper.position.getX() == x && chopper.position.getY() == y) {
+                chopper.changeState(Element.DEAD_MEAT_CHOPPER);
+            }
+        }
     }
 
     Point getBomber() {
