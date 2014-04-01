@@ -1,6 +1,5 @@
 package com.codenjoy.bomberman
 
-import com.codenjoy.bomberman.utils.LengthToXY
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -52,7 +51,7 @@ class GameStateTest extends Specification {
 
     @Unroll
     def "generate successor (bomb timer)"(List<Action> actions, Element expectedTimer, String bomberAt) {
-        def state = new GameState(createBoardWithBomberAt(4, 4, 7), true).generateSuccessor(ACT)
+        def state = new GameState(TestUtils.createBoardWithBomberAt(4, 4, 7), true).generateSuccessor(ACT)
         actions.each { action -> state = state.generateSuccessor(action) }
         expect:
         assert state.at(4, 4) == expectedTimer
@@ -67,7 +66,7 @@ class GameStateTest extends Specification {
     }
 
     def "generate successor (boom)"() {
-        def state = new GameState(createBoardWithBomberAt(5, 5, 9), true).generateSuccessor(ACT)
+        def state = new GameState(TestUtils.createBoardWithBomberAt(5, 5, 9), true).generateSuccessor(ACT)
         4.times { state = state.generateSuccessor(LEFT) }
         when:
         GameState boomState = state.generateSuccessor(DOWN)
@@ -84,7 +83,7 @@ class GameStateTest extends Specification {
     }
 
     def "generate successor (boomed bomber)"() {
-        def state = new GameState(createBoardWithBomberAt(5, 5, 9), true).generateSuccessor(ACT)
+        def state = new GameState(TestUtils.createBoardWithBomberAt(5, 5, 9), true).generateSuccessor(ACT)
         4.times { it ->
             state = state.generateSuccessor(STOP)
         }
@@ -96,8 +95,8 @@ class GameStateTest extends Specification {
     }
 
     def "generate successor (boomed chopper)"() {
-        def board = createBoardWithBomberAt(5, 5, 9)
-        board = setElement(9, 5, 5 + 1, Element.MEAT_CHOPPER.char, board.chars)
+        def board = TestUtils.createBoardWithBomberAt(5, 5, 9)
+        board = TestUtils.setElement(9, 5, 5 + 1, Element.MEAT_CHOPPER.char, board.chars)
 
         def state1 = new GameState(board, true)
         def state = state1.generateSuccessor(ACT)
@@ -110,27 +109,17 @@ class GameStateTest extends Specification {
         assert boomState.at(5, 5 + 1) == Element.DEAD_MEAT_CHOPPER
     }
 
+    def "generate successor (eaten bomber)"() {
+        def board = TestUtils.createBoardWithBomberAt(5, 5, 9)
+        board = TestUtils.setElement(9, 5, 5 + 1, Element.MEAT_CHOPPER.char, board.chars)
 
-    private static String createBoardWithBomberAt(int x, int y, int width) {
-        def chars = emptyBoard(width).chars
-
-        setElement(width, x, y, '☺' as char, chars)
+        def state = new GameState(board, true)
+        when:
+        GameState eatenState = state.generateSuccessor(DOWN)
+        then:
+        assert eatenState.isDead()
     }
 
-    private static String setElement(int width, int x, int y, char elementChar, char[] chars) {
-        def point = y * (width + 2) + x
-
-        chars[point] = elementChar
-        def board = new String(chars)
-        board
-    }
-
-    private static def emptyBoard(int size) {
-        String result = '☼' * (size + 2)
-        size.times { result += '☼' + ' ' * size + '☼' }
-        result += '☼' * (size + 2)
-        result
-    }
 
     public static final String BOMBER_LEFT_UP_CORNER = """
 ☼☼☼☼

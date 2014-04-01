@@ -147,6 +147,12 @@ public class GameState {
 
         tickAllBombs(newGameState);
 
+        for (ElementState chopper : newGameState.choppers) {
+            if (chopper.position.equals(newGameState.bomber.position)) {
+                newGameState.bomber.changeState(DEAD_BOMBERMAN);
+            }
+        }
+
         if (action == Action.ACT) {
             newGameState.bombs.add(new ElementState(bomber.position, BOMB_TIMER_5));
         }
@@ -232,6 +238,14 @@ public class GameState {
 
     public boolean isDead() {
         return bomber.isDead();
+    }
+
+    public List<ElementState> getChoppers() {
+        return choppers;
+    }
+
+    public List<ElementState> getBombs() {
+        return bombs;
     }
 
     private interface Elements {
