@@ -4,6 +4,9 @@ import com.codenjoy.bomberman.utils.BitElements;
 import com.codenjoy.bomberman.utils.Board;
 import com.codenjoy.bomberman.utils.LengthToXY;
 import com.codenjoy.bomberman.utils.Point;
+import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.*;
 
@@ -146,18 +149,21 @@ public class GameState {
         newGameState.bomber.move(action);
 
         tickAllBombs(newGameState);
-
-        for (ElementState chopper : newGameState.choppers) {
-            if (chopper.position.equals(newGameState.bomber.position)) {
-                newGameState.bomber.changeState(DEAD_BOMBERMAN);
-            }
-        }
+        killBomberWhenOnChopper(newGameState);
 
         if (action == Action.ACT) {
             newGameState.bombs.add(new ElementState(bomber.position, BOMB_TIMER_5));
         }
         return newGameState;
 
+    }
+
+    private void killBomberWhenOnChopper(GameState newGameState) {
+        for (ElementState chopper : newGameState.choppers) {
+            if (chopper.position.equals(newGameState.bomber.position)) {
+                newGameState.bomber.changeState(DEAD_BOMBERMAN);
+            }
+        }
     }
 
     private void tickAllBombs(GameState newGameState) {
@@ -299,4 +305,36 @@ public class GameState {
         }
         return sb.toString();
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof GameState)) {
+            return false;
+        }
+        GameState other = (GameState) obj;
+        return new EqualsBuilder()
+                .append(bomber, other.bomber)
+                .append(bombs, other.bombs)
+                .append(otherBombers, other.otherBombers)
+                .append(choppers, other.choppers)
+                .append(explosion, other.explosion)
+                .append(walls, other.walls)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+/*
+        System.out.println("bomber.hashCode() = " + bomber.hashCode());
+        System.out.println("bombs.hashCode() = " + bombs.hashCode());
+        System.out.println("otherBombers.hashCode() = " + otherBombers.hashCode());
+        System.out.println("choppers.hashCode() = " + choppers.hashCode());
+        System.out.println("explosion.hashCode() = " + explosion.hashCode());
+        System.out.println("walls.hashCode() = " + new HashCodeBuilder().append(walls).toHashCode());
+        System.out.println("------------------------------------");
+*/
+        return new HashCodeBuilder()
+                .append(bomber).append(bombs).append(otherBombers).append(choppers).append(explosion).append(walls).toHashCode();
+    }
+
 }

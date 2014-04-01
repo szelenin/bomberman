@@ -1,5 +1,8 @@
 package com.codenjoy.bomberman.utils;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 /**
  * Created by szelenin on 2/18/14.
  */
@@ -43,5 +46,19 @@ public class BitElements {
         BitElements bitElements = new BitElements(size);
         System.arraycopy(this.bytes, 0, bitElements.bytes, 0, bitElements.bytes.length);
         return bitElements;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof BitElements)) {
+            return false;
+        }
+        BitElements other = (BitElements) obj;
+        return new EqualsBuilder().append(bytes, other.bytes).isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder().append(bytes).toHashCode();
     }
 }

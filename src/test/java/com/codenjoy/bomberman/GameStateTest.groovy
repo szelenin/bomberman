@@ -120,6 +120,17 @@ class GameStateTest extends Specification {
         assert eatenState.isDead()
     }
 
+    def "equality"() {
+        def board = TestUtils.createBoardWithBomberAt(5, 5, 9)
+        GameState initialState = new GameState(TestUtils.setElement(9, 5, 5 + 1, Element.MEAT_CHOPPER.char, board.chars), true)
+
+        when:
+        def successor = initialState.generateSuccessor(STOP)
+
+        then:
+        successor.hashCode() == initialState.hashCode()
+        successor == initialState
+    }
 
     public static final String BOMBER_LEFT_UP_CORNER = """
 ☼☼☼☼

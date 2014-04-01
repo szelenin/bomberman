@@ -1,6 +1,7 @@
 package com.codenjoy.bomberman.utils;
 
 import com.codenjoy.bomberman.Action;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
  * User: oleksandr.baglai
@@ -26,6 +27,11 @@ public class Point {
     public boolean equals(Object o) {
         Point pt = (Point)o;
         return pt.x == x && pt.y == y;
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder().append(x).append(y).toHashCode();
     }
 
     @Override
