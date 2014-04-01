@@ -43,7 +43,6 @@ public class AstarSearch implements SearchFunction {
             }
             if (!closed.contains(node.state)) {
                 closed.add(node.state);
-                System.out.println("node.state = " + node.state);
                 List<Successor> successors = problem.getSuccessors(node.state);
                 for (Successor successor : successors) {
                     int totalCost = costs.get(node.state) + successor.cost;

@@ -8,16 +8,24 @@ import java.util.List;
 class NearestChopperToBombHeuristic implements Heuristic {
     @Override
     public int calculate(GameState state) {
+/*
         //bomb is set
         List<ElementState> bombs = state.getBombs();
         if (bombs.isEmpty()) {
-            int minDist = Integer.MAX_VALUE;
-            for (ElementState chopper : state.getChoppers()) {
-                minDist = Math.min(dist(state, chopper), minDist);
-            }
+            int minDist = distToclosestChopper(state);
             return 5 + minDist;
         }
         return bombs.get(0).state.getChar() - '0';
+*/
+        return distToclosestChopper(state);
+    }
+
+    private int distToclosestChopper(GameState state) {
+        int minDist = Integer.MAX_VALUE;
+        for (ElementState chopper : state.getChoppers()) {
+            minDist = Math.min(dist(state, chopper), minDist);
+        }
+        return minDist;
     }
 
     private int dist(GameState state, ElementState chopper) {

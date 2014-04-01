@@ -1,5 +1,7 @@
 package com.codenjoy.bomberman;
 
+import java.util.List;
+
 /**
  * Created by szelenin on 3/25/14.
  */
@@ -11,6 +13,7 @@ public abstract class Agent {
     }
 
     public Action getAction(GameState state) {
-        return searchFunction.search(new Problem(state)).get(0);
+        List<Action> result = searchFunction.search(new Problem(state));
+        return result.get(0);
     }
 }

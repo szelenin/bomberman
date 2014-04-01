@@ -12,17 +12,26 @@ class AstarBombChoppersAgentTest extends Specification {
         String board = setElement(9, 4, 4, Element.MEAT_CHOPPER.char, createBoardWithBomberAt(5, 5, 9).chars)
         def currentState = new GameState(board, true)
         def agent = new AstarBombChoppersAgent()
-        boolean deadMeatChopper = false
+        int iteration = 0
         when:
-        5.each {
+        while (!isDeadChopper(currentState) && iteration <=  5+2) {
             Action action = agent.getAction(currentState)
             currentState = currentState.generateSuccessor(action)
-            if (currentState.at(4, 4) == Element.DEAD_MEAT_CHOPPER) {
-                deadMeatChopper = true
-            }
+            iteration ++
         }
 
         then:
-        assert deadMeatChopper
+        assert iteration <=  5+2
     }
+
+    public boolean isDeadChopper(GameState state) {
+        List<ElementState> choppers = state.getChoppers();
+        for (ElementState chopper : choppers) {
+            if (chopper.isDead()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }
