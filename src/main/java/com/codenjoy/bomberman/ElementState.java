@@ -17,7 +17,7 @@ class ElementState {
     }
 
     public boolean isDead() {
-        return state == Element.OTHER_DEAD_BOMBERMAN || state == Element.DEAD_BOMBERMAN;
+        return state == Element.OTHER_DEAD_BOMBERMAN || state == Element.DEAD_BOMBERMAN || state == Element.DEAD_MEAT_CHOPPER;
     }
 
     public void move(Action action) {

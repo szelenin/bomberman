@@ -107,6 +107,7 @@ class GameStateTest extends Specification {
         GameState boomState = state.generateSuccessor(STOP)
         then:
         assert boomState.at(5, 5 + 1) == Element.DEAD_MEAT_CHOPPER
+        assert boomState.choppers.find({chopper->chopper.isDead()}) != null
     }
 
     def "generate successor (eaten bomber)"() {
@@ -130,6 +131,25 @@ class GameStateTest extends Specification {
         then:
         successor.hashCode() == initialState.hashCode()
         successor == initialState
+    }
+
+    def "bomber in bomb center (exception in game)"() {
+        def state = new GameState("☼☼☼☼☼☼☼☼☼☼☼\n" +
+                "☼         ☼\n" +
+                "☼         ☼\n" +
+                "☼         ☼\n" +
+                "☼   x     ☼\n" +
+                "☼ 1       ☼\n" +
+                "☼ ☺       ☼\n" +
+                "☼         ☼\n" +
+                "☼         ☼\n" +
+                "☼         ☼\n" +
+                "☼☼☼☼☼☼☼☼☼☼☼")
+
+        when:
+        def newState = state.generateSuccessor(UP)
+        then:
+        assert newState != null
     }
 
     public static final String BOMBER_LEFT_UP_CORNER = """
