@@ -196,7 +196,7 @@ public class GameState {
     }
 
     private void addExplosionIfNoWall(GameState newGameState, int x, int y) {
-        if (x < 0 || y < 0) {
+        if (x < 0 || y < 0 || x >= toXY.boardSize || y >=toXY.boardSize) {
             return;
         }
         Element element = newGameState.at(x, y);
@@ -335,17 +335,11 @@ public class GameState {
 
     @Override
     public int hashCode() {
-/*
-        System.out.println("bomber.hashCode() = " + bomber.hashCode());
-        System.out.println("bombs.hashCode() = " + bombs.hashCode());
-        System.out.println("otherBombers.hashCode() = " + otherBombers.hashCode());
-        System.out.println("choppers.hashCode() = " + choppers.hashCode());
-        System.out.println("explosion.hashCode() = " + explosion.hashCode());
-        System.out.println("walls.hashCode() = " + new HashCodeBuilder().append(walls).toHashCode());
-        System.out.println("------------------------------------");
-*/
         return new HashCodeBuilder()
                 .append(bomber).append(bombs).append(otherBombers).append(choppers).append(explosion).append(walls).toHashCode();
     }
 
+    public List<ElementState> getExplosion() {
+        return explosion;
+    }
 }

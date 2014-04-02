@@ -107,7 +107,7 @@ class GameStateTest extends Specification {
         GameState boomState = state.generateSuccessor(STOP)
         then:
         assert boomState.at(5, 5 + 1) == Element.DEAD_MEAT_CHOPPER
-        assert boomState.choppers.find({chopper->chopper.isDead()}) != null
+        assert boomState.choppers.find({ chopper -> chopper.isDead() }) != null
     }
 
     def "generate successor (eaten bomber)"() {
@@ -150,6 +150,30 @@ class GameStateTest extends Specification {
         def newState = state.generateSuccessor(UP)
         then:
         assert newState != null
+    }
+
+    def "bomb tick not equals state with previous"() {
+        def board = TestUtils.createBoardWithBomberAt(5, 5, 9)
+        board = TestUtils.setElement(9, 5, 5 + 1, Element.BOMB_TIMER_2.char, board.chars)
+        GameState initialState = new GameState(board, true)
+        when:
+        GameState state = initialState.generateSuccessor(STOP)
+
+        then:
+        assert initialState != state
+        assert initialState.hashCode() != state.hashCode()
+    }
+
+    def "bomb exploded out of border"() {
+        def board = TestUtils.createBoardWithBomberAt(5, 5, 9)
+        def state = new GameState(TestUtils.setElement(9, 5 + 3, 5 + 3, Element.BOMB_TIMER_1.char, board.chars), true)
+
+        when:
+        def newState = state.generateSuccessor(STOP)
+
+        then:
+        assert newState.at(9, 5 + 3) == Element.BOOM
+        assert newState.at(5 + 3, 9) == Element.BOOM
     }
 
     public static final String BOMBER_LEFT_UP_CORNER = """
