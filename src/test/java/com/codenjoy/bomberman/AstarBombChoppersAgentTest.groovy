@@ -24,6 +24,18 @@ class AstarBombChoppersAgentTest extends Specification {
         assert iteration <=  5+2
     }
 
+    def "dead bomber initial state"() {
+        def startState = new GameState("☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼###    #♥# ##          #   #   ☼☼ ☼ ☼#☼ ☼ ☼ ☼&☼Ѡ☼ ☼ ☼ ☼ ☼#☼ ☼ ☼ ☼☼           & H҉҉҉҉ ### ##  #   ☼☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼҉☼ ☼ ☼#☼ ☼#☼ ☼ ☼ ☼☼      &       H                ☼☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼☼       # ####       #    # # # ☼☼ ☼ ☼ ☼ ☼#☼ ☼ ☼ ☼ ☼ ☼#☼#☼ ☼#☼ ☼ ☼☼  #                  #         ☼☼&☼ ☼ ☼ ☼ ☼ ☼#☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼☼        ## #         #    &  # ☼☼ ☼ ☼ ☼&☼ ☼&☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼☼ #       #      #              ☼☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼&☼ ☼ ☼#☼☼          #    #  # #          ☼☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼#☼#☼ ☼ ☼ ☼ ☼☼     #         ## #         #  ☼☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼♥☼ ☼ ☼ ☼ ☼ ☼ ☼☼  #              ##    ##  ##  ☼☼ ☼ ☼ ☼ ☼ ☼ ☼#☼ ☼#☼ ☼ ☼ ☼#☼ ☼#☼ ☼☼                           # ##☼☼#☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼#☼#☼#☼ ☼#☼ ☼ ☼#☼☼   #         #       #         ☼☼ ☼ ☼#☼ ☼ ☼ ☼#☼ ☼ ☼ ☼#☼#☼ ☼ ☼ ☼ ☼☼         #   #    ## #         ☼☼ ☼ ☼#☼ ☼ ☼&☼ ☼ ☼ ☼ ☼ ☼#☼ ☼ ☼ ☼#☼☼              #      ##        ☼☼ ☼#☼#☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼#☼ ☼ ☼#☼☼       #  #           #       #☼☼ ☼ ☼#☼ ☼#☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼#☼ ☼ ☼ ☼☼    #     &           #        ☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼")
+        def agent = new AstarBombChoppersAgent()
+
+
+        when:
+        def action = agent.getAction(startState)
+
+        then:
+        assert action != null
+    }
+
     public boolean isDeadChopper(GameState state) {
         List<ElementState> choppers = state.getChoppers();
         for (ElementState chopper : choppers) {

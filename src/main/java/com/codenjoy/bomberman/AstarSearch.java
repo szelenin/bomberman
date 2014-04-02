@@ -35,7 +35,7 @@ public class AstarSearch implements SearchFunction {
 
         while (true) {
             if (fringe.isEmpty()) {
-                return Arrays.asList(Action.STOP);
+                return Arrays.asList(Action.ACT);
             }
             Node node = fringe.poll();
             if (problem.isGoalState(node.state)) {

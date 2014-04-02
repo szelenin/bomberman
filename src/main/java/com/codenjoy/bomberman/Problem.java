@@ -14,6 +14,9 @@ public class Problem {
     }
 
     public List<Successor> getSuccessors(GameState state) {
+        if (state.isDead()) {
+            return new ArrayList<Successor>();
+        }
         ArrayList<Successor> successors = new ArrayList<Successor>();
         List<Action> actions = state.getLegalActions();
         for (Action action : actions) {
