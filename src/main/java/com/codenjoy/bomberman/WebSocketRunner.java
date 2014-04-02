@@ -22,19 +22,15 @@ public class WebSocketRunner {
     private static String USER_NAME = "sergey";
 
     private WebSocket.Connection connection;
-    private DirectionSolver solver;
     private WebSocketClientFactory factory;
 
-    public WebSocketRunner(DirectionSolver solver) {
-        this.solver = solver;
-    }
 
     public static void main(String[] args) throws Exception {
         run(SERVER, USER_NAME);
     }
 
     private static void run(String server, String userName) throws Exception {
-        final WebSocketRunner client = new WebSocketRunner(new YourDirectionSolver());
+        final WebSocketRunner client = new WebSocketRunner();
         client.start(server, userName);
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
@@ -75,11 +71,19 @@ public class WebSocketRunner {
                 if (!matcher.matches()) {
                     throw new RuntimeException("WTF? " + data);
                 }
-                String answer = solver.get(new Board(matcher.group(1)));
+                String boardString = matcher.group(1);
                 try {
-                    connection.sendMessage(answer);
+                    Action action = new AstarBombChoppersAgent().getAction(new GameState(boardString));
+                    connection.sendMessage(action.toString());
                 } catch (IOException e) {
                     e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    try {
+                        connection.sendMessage(Action.STOP.toString());
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
                 }
             }
         }).get(5000, TimeUnit.MILLISECONDS);

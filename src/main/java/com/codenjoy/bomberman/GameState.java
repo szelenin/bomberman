@@ -140,6 +140,14 @@ public class GameState {
         return false;
     }
 
+    public GameState generateSuccessor(List<Action> actions) {
+        GameState result = this;
+        for (Action action : actions) {
+            result = generateSuccessor(action);
+        }
+        return result;
+    }
+
     public GameState generateSuccessor(Action action) {
         if (!getLegalActions().contains(action)) {
             throw new IllegalArgumentException("Can't do " + action.name());
@@ -188,6 +196,9 @@ public class GameState {
     }
 
     private void addExplosionIfNoWall(GameState newGameState, int x, int y) {
+        if (x < 0 || y < 0) {
+            return;
+        }
         Element element = newGameState.at(x, y);
         if (element != Element.WALL) {
             newGameState.explosion.add(new ElementState(new Point(x, y), BOOM));

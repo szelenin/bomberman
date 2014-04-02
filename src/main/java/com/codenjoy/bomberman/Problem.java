@@ -28,6 +28,9 @@ public class Problem {
         if (action != Action.STOP) {
             totalCost++;
         }
+        if (action == Action.ACT) {
+            totalCost +=2;
+        }
         if (newState.isDead()) {
             totalCost += 1000;
         }
@@ -45,7 +48,7 @@ public class Problem {
     public boolean isGoalState(GameState state) {
         List<ElementState> choppers = state.getChoppers();
         for (ElementState chopper : choppers) {
-            if (chopper.isDead()) {
+            if (chopper.isDead() && !state.isDead()) {
                 return true;
             }
         }

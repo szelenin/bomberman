@@ -14,6 +14,10 @@ public abstract class Agent {
 
     public Action getAction(GameState state) {
         List<Action> result = searchFunction.search(new Problem(state));
+        System.out.println("path = " + result);
+        if (result.isEmpty()) {
+            return Action.STOP;
+        }
         return result.get(0);
     }
 }
