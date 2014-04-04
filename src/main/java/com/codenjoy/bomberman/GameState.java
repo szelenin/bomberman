@@ -189,7 +189,7 @@ public class GameState {
     private void explodeBomb(GameState newGameState, ElementState bomb) {
         for (int i = -3; i <= 3; i++) {
             int x = bomb.position.getX() + i;
-            int y = bomb.position.getX() + i;
+            int y = bomb.position.getY() + i;
             addExplosionIfNoWall(newGameState, x, bomb.position.getY());
             addExplosionIfNoWall(newGameState, bomb.position.getX(), y);
         }

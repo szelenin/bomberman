@@ -5,7 +5,7 @@ import org.javatuples.Pair;
 /**
  * Created by szelenin on 4/1/14.
  */
-class NearestChopperToBombHeuristic implements Heuristic {
+public class NearestChopperToBombHeuristic implements Heuristic {
     @Override
     public int calculate(GameState state) {
         Pair<ElementState,Integer> nearestBomb = Utils.nearestBomb(state);

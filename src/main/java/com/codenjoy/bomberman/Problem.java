@@ -42,7 +42,7 @@ public class Problem {
         boolean bombIsSet = nearestBomb != null;
         //if bomb is set then penalty for being close to bomb
         if (bombIsSet) {
-            totalCost += (double) Utils.STAY_ON_BOMB_REVENUE / Math.pow(nearestBomb.getValue1() + 1, 2) * ('6' - nearestBomb.getValue0().state.getChar());
+            totalCost += divideOnSquareDistanceTo(nearestBomb, Utils.STAY_ON_BOMB_REVENUE) * ('6' - nearestBomb.getValue0().state.getChar());
         }
 
         //penalty for setting bomb
@@ -50,17 +50,14 @@ public class Problem {
         if (nearestChopper != null) {
             totalCost += (double) nearestChopper.getValue1() / (newState.getBoardSize() * 2)  * Utils.CHOPPER_NEAR_REVENUE;
         }
-/*
-        // dead chopper
-        List<ElementState> choppers = newState.getChoppers();
-        for (ElementState chopper : choppers) {
-            if (chopper.isDead()) {
-                totalCost += Utils.DEAD_CHOPPER_REVENUE;
-            }
-        }
-*/
 
+        //penalty to being close to chopper
+//        totalCost += divideOnSquareDistanceTo(nearestChopper, Utils.CHOPPER_NEAR_REVENUE);
         return totalCost;
+    }
+
+    private double divideOnSquareDistanceTo(Pair<ElementState, Integer> nearestBomb, double penalty) {
+        return penalty / Math.pow(nearestBomb.getValue1() + 1, 2);
     }
 
     public boolean isGoalState(GameState state) {
