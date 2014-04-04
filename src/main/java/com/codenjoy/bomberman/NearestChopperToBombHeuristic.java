@@ -1,13 +1,17 @@
 package com.codenjoy.bomberman;
 
-import java.util.List;
+import org.javatuples.Pair;
 
 /**
-* Created by szelenin on 4/1/14.
-*/
+ * Created by szelenin on 4/1/14.
+ */
 class NearestChopperToBombHeuristic implements Heuristic {
     @Override
     public int calculate(GameState state) {
+        Pair<ElementState,Integer> nearestBomb = Utils.nearestBomb(state);
+        if (nearestBomb != null) {
+            return -(Utils.minDistToElement(state, state.getBombs()).getValue1() + 1);
+        }
 /*
         //bomb is set
         List<ElementState> bombs = state.getBombs();
@@ -17,18 +21,7 @@ class NearestChopperToBombHeuristic implements Heuristic {
         }
         return bombs.get(0).state.getChar() - '0';
 */
-        return distToclosestChopper(state);
+        return Utils.distToclosestChopper(state);
     }
 
-    private int distToclosestChopper(GameState state) {
-        int minDist = Integer.MAX_VALUE;
-        for (ElementState chopper : state.getChoppers()) {
-            minDist = Math.min(dist(state, chopper), minDist);
-        }
-        return minDist;
-    }
-
-    private int dist(GameState state, ElementState chopper) {
-        return Math.abs(chopper.position.getX() - state.getBomber().getX()) + Math.abs(chopper.position.getY() - state.getBomber().getY());
-    }
 }

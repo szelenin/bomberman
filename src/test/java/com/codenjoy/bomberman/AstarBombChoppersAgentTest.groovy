@@ -17,6 +17,7 @@ class AstarBombChoppersAgentTest extends Specification {
         while (!isDeadChopper(currentState) && iteration <=  5+2) {
             Action action = agent.getAction(currentState)
             currentState = currentState.generateSuccessor(action)
+            println "$currentState"
             iteration ++
         }
 

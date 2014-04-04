@@ -1,5 +1,7 @@
 package com.codenjoy.bomberman;
 
+import org.javatuples.Pair;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,20 +30,26 @@ public class Problem {
 
     private int cost(Action action, GameState newState) {
         int totalCost = 0;
+        // cost of move
         if (action != Action.STOP) {
             totalCost++;
         }
-        if (action == Action.ACT) {
-            totalCost +=2;
-        }
+        // dead bomber
         if (newState.isDead()) {
-            totalCost += 1000;
+            totalCost += Utils.DEAD_BOMBER_REVENUE;
+        }
+        Pair<ElementState, Integer> nearestBomb = Utils.nearestBomb(newState);
+        boolean bombIsSet = nearestBomb != null;
+        //if bomb is set then penalty been close to bomb
+        if (bombIsSet) {
+            totalCost += (double) Utils.STAY_ON_BOMB_REVENUE / Math.pow(nearestBomb.getValue1() + 1, 2) * ('5' - nearestBomb.getValue0().state.getChar());
         }
 
+        // dead chopper
         List<ElementState> choppers = newState.getChoppers();
         for (ElementState chopper : choppers) {
             if (chopper.isDead()) {
-                totalCost -= 500;
+                totalCost += Utils.DEAD_CHOPPER_REVENUE;
             }
         }
 

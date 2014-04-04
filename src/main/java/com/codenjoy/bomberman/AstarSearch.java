@@ -57,6 +57,7 @@ public class AstarSearch implements SearchFunction {
     private List<Action> constructPath(Node node) {
         if (node.previousNode != null) {
             List<Action> prev = constructPath(node.previousNode);
+            System.out.print(String.format("%s, %d: ", node.action, costs.get(node.state)));
             prev.add(node.action);
             return prev;
         } else {
