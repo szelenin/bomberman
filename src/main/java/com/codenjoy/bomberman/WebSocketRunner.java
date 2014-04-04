@@ -4,6 +4,7 @@ import com.codenjoy.bomberman.utils.Board;
 import org.eclipse.jetty.websocket.WebSocket;
 import org.eclipse.jetty.websocket.WebSocketClientFactory;
 
+import javax.rmi.CORBA.Util;
 import java.io.IOException;
 import java.net.URI;
 import java.util.concurrent.TimeUnit;
@@ -73,7 +74,11 @@ public class WebSocketRunner {
                 }
                 String boardString = matcher.group(1);
                 try {
-                    Action action = new AstarBombChoppersAgent().getAction(new GameState(boardString));
+                    GameState state = new GameState(boardString);
+                    if (state.isDead()) {
+                        System.out.println("DEAD!!!");
+                    }
+                    Action action = new AstarBombChoppersAgent().getAction(state);
                     connection.sendMessage(action.toString());
                 } catch (IOException e) {
                     e.printStackTrace();

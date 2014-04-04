@@ -40,11 +40,17 @@ public class Problem {
         }
         Pair<ElementState, Integer> nearestBomb = Utils.nearestBomb(newState);
         boolean bombIsSet = nearestBomb != null;
-        //if bomb is set then penalty been close to bomb
+        //if bomb is set then penalty for being close to bomb
         if (bombIsSet) {
-            totalCost += (double) Utils.STAY_ON_BOMB_REVENUE / Math.pow(nearestBomb.getValue1() + 1, 2) * ('5' - nearestBomb.getValue0().state.getChar());
+            totalCost += (double) Utils.STAY_ON_BOMB_REVENUE / Math.pow(nearestBomb.getValue1() + 1, 2) * ('6' - nearestBomb.getValue0().state.getChar());
         }
 
+        //penalty for setting bomb
+        Pair<ElementState, Integer> nearestChopper = Utils.nearestChopper(newState);
+        if (nearestChopper != null) {
+            totalCost += (double) nearestChopper.getValue1() / (newState.getBoardSize() * 2)  * Utils.CHOPPER_NEAR_REVENUE;
+        }
+/*
         // dead chopper
         List<ElementState> choppers = newState.getChoppers();
         for (ElementState chopper : choppers) {
@@ -52,6 +58,7 @@ public class Problem {
                 totalCost += Utils.DEAD_CHOPPER_REVENUE;
             }
         }
+*/
 
         return totalCost;
     }

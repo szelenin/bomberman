@@ -265,6 +265,11 @@ public class GameState {
         return bombs;
     }
 
+    public int getBoardSize() {
+        return toXY.boardSize;
+    }
+
+
     private interface Elements {
         void add(ElementState elementState, GameState gameState);
     }
