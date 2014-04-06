@@ -8,10 +8,10 @@ import java.util.List;
  * Created by szelenin on 4/3/14.
  */
 public class Utils {
-    public static final int CHOPPER_NEAR_REVENUE = 20;
+    public static final int CHOPPER_NEAR_REVENUE = 30;
     public static final int DEAD_CHOPPER_REVENUE = -200;
     public static final int DEAD_BOMBER_REVENUE = 1000;
-    public static final int STAY_ON_BOMB_REVENUE = 400;
+    public static final int STAY_ON_BOMB_REVENUE = 20;
     public static final int ACT_NEAR_CHOPPER_REVENUE = -50;
 
     static int distToclosestChopper(GameState state) {
