@@ -1,10 +1,12 @@
 package com.codenjoy.bomberman;
 
 import com.codenjoy.bomberman.utils.Board;
+import org.apache.commons.io.FileUtils;
 import org.eclipse.jetty.websocket.WebSocket;
 import org.eclipse.jetty.websocket.WebSocketClientFactory;
 
 import javax.rmi.CORBA.Util;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.concurrent.TimeUnit;
@@ -52,10 +54,8 @@ public class WebSocketRunner {
 
     private void start(String server, String userName) throws Exception {
         final Pattern urlPattern = Pattern.compile("^board=(.*)$");
-
         factory = new WebSocketClientFactory();
         factory.start();
-
         org.eclipse.jetty.websocket.WebSocketClient client = factory.newWebSocketClient();
         connection = client.open(new URI(server + "?user=" + userName), new WebSocket.OnTextMessage() {
             public void onOpen(Connection connection) {
@@ -75,6 +75,8 @@ public class WebSocketRunner {
                 String boardString = matcher.group(1);
                 try {
                     GameState state = new GameState(boardString);
+                    FileUtils.write(new File("out.txt"), boardString+"\n", true);
+
                     if (state.isDead()) {
                         System.out.println("DEAD!!!");
                     }

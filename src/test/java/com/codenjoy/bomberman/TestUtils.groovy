@@ -6,9 +6,13 @@ package com.codenjoy.bomberman
 class TestUtils {
 
     static String createBoardWithBomberAt(int x, int y, int width) {
+        createBoardWithElementAt(x, y, width, Element.BOMBERMAN)
+    }
+
+    static String createBoardWithElementAt(int x, int y, int width, Element element) {
         def chars = emptyBoard(width).chars
 
-        setElement(width, x, y, '☺' as char, chars)
+        setElement(width, x, y, element.char, chars)
     }
 
     static String setElement(int width, int x, int y, char elementChar, char[] chars) {
