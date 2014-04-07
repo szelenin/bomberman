@@ -23,6 +23,7 @@ public class BoardReplay extends JFrame {
     private final BufferedImage[] images = new BufferedImage[values().length];
     private Map<Element, String> elementToFile = new HashMap<Element, String>();
     private BufferedImage buffer;
+    private int counter = 1;
 
     public BoardReplay() throws IOException {
         elementToFile.put(BOMB_BOMBERMAN, "bomb_bomberman.png");
@@ -92,7 +93,7 @@ public class BoardReplay extends JFrame {
         g.drawImage(buffer, 0, 0, this);
     }
 
-    private void drawBoard(String boardString, int boardSize) {
+    private void drawBoard(String boardString, int boardSize) throws IOException {
         int spriteWidth = images[0].getWidth();
         int spriteHeight = images[0].getHeight();
         buffer = new BufferedImage(spriteWidth * (boardSize + 1), spriteHeight * (boardSize + 1), BufferedImage.TYPE_INT_ARGB);
@@ -104,5 +105,8 @@ public class BoardReplay extends JFrame {
             Point xy = toXY.getXY(i);
             graphics.drawImage(images[element.ordinal()], (xy.getX() + 1) * spriteWidth, (xy.getY() +1)* spriteHeight, this);
         }
+        File file = new File("board" + counter + ".gif");
+        counter++;
+        ImageIO.write(buffer, "gif", file);
     }
 }
