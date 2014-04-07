@@ -7,7 +7,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 /**
  * Created by szelenin on 3/7/14.
  */
-class ElementState {
+public class ElementState {
     public Point position;
     public Element state;
 

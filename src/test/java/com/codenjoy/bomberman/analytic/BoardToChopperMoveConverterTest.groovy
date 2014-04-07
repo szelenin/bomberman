@@ -5,6 +5,8 @@ import com.codenjoy.bomberman.TestUtils
 import org.apache.commons.io.FileUtils
 import spock.lang.Specification
 
+import static com.codenjoy.bomberman.TestUtils.createBoardWithElementAt
+
 /**
  * Created by szelenin on 4/7/14.
  */
@@ -20,7 +22,7 @@ class BoardToChopperMoveConverterTest extends Specification {
     }
 
     def "convert initial state"() {
-        def board1 = TestUtils.createBoardWithElementAt(5, 5, 9, Element.MEAT_CHOPPER)
+        def board1 = createBoardWithElementAt(5, 5, 9, Element.MEAT_CHOPPER)
         def converter = new BoardToChopperMoveConverter(tmpFile.getAbsolutePath())
 
         when:
@@ -31,10 +33,22 @@ class BoardToChopperMoveConverterTest extends Specification {
         verifyLine(lines[0], "NA", 0,0,0,0, "NA")
     }
 
+    def "convert second state"() {
+        def converter = new BoardToChopperMoveConverter(tmpFile.getAbsolutePath())
+
+        when:
+        converter.processState(createBoardWithElementAt(5, 5, 9, Element.MEAT_CHOPPER))
+        converter.processState(createBoardWithElementAt(5, 5 + 1, 9, Element.MEAT_CHOPPER))
+
+        then:
+        def lines = FileUtils.readLines(tmpFile)
+        verifyLine(lines[1], "D", 0,0,0,0, "NA")
+    }
+
     def "convert simple"() {
-        def board1 = TestUtils.createBoardWithElementAt(5, 5, 9, Element.MEAT_CHOPPER)
-        def board2 = TestUtils.createBoardWithElementAt(5, 5 + 1, 9, Element.MEAT_CHOPPER)
-        def board3 = TestUtils.createBoardWithElementAt(5, 5 + 2, 9, Element.MEAT_CHOPPER)
+        def board1 = createBoardWithElementAt(5, 5, 9, Element.MEAT_CHOPPER)
+        def board2 = createBoardWithElementAt(5, 5 + 1, 9, Element.MEAT_CHOPPER)
+        def board3 = createBoardWithElementAt(5, 5 + 2, 9, Element.MEAT_CHOPPER)
 
         def converter = new BoardToChopperMoveConverter('out.csv')
         when:
