@@ -36,8 +36,12 @@ class BoardToChopperMoveConverterTest extends Specification {
 
         where:
         boardStrings                                    | expectedLines
-        [board(5, 5, 9, MEAT_CHOPPER)] | ['NA,0,0,0,0,NA']
-        [board(5, 5, 9, MEAT_CHOPPER), board(5, 5 + 1, 9, MEAT_CHOPPER)] | ['NA,0,0,0,0,NA', 'D,0,0,0,0,NA']
+        ['&'(5, 5)] | ['NA,0,0,0,0,NA']
+        ['&'(5, 5), '&'(5, 5 + 1)] | ['NA,0,0,0,0,NA', 'D,0,0,0,0,NA']
+    }
+
+    def '&'(int x, int y){
+        board(x, y, 9, MEAT_CHOPPER)
     }
 
     def verifyLine(String line, String previousMove, int isUpOccupied, int isDownOccupied, int isLeftOccupied, int isRightOccupied, String nextMove) {
