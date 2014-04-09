@@ -4,7 +4,10 @@ import com.codenjoy.bomberman.Element
 import com.codenjoy.bomberman.TestUtils
 import org.apache.commons.io.FileUtils
 import spock.lang.Specification
+import spock.lang.Unroll
 
+import static com.codenjoy.bomberman.Element.*
+import static com.codenjoy.bomberman.TestUtils.board
 import static com.codenjoy.bomberman.TestUtils.createBoardWithElementAt
 
 /**
@@ -14,63 +17,45 @@ class BoardToChopperMoveConverterTest extends Specification {
     private def tmpDir
     private File tmpFile
 
-    def setup(){
+    def setup() {
         tmpDir = new File(FileUtils.getTempDirectory(), 'test')
         FileUtils.deleteDirectory(tmpDir)
 
         tmpFile = new File(tmpDir, "out.csv")
     }
 
-    def "convert initial state"() {
-        def board1 = createBoardWithElementAt(5, 5, 9, Element.MEAT_CHOPPER)
+    @Unroll
+    def "convert board states"(def boardStrings, def expectedLines) {
         def converter = new BoardToChopperMoveConverter(tmpFile.getAbsolutePath())
+        boardStrings.each { it -> converter.processState(it) }
 
-        when:
-        converter.processState(board1)
-
-        then:
+        expect:
         def lines = FileUtils.readLines(tmpFile)
-        verifyLine(lines[0], "NA", 0,0,0,0, "NA")
-    }
+        int i = 0
+        lines.each { line -> verifyLine2(line, expectedLines[i]); i++}
 
-    def "convert second state"() {
-        def converter = new BoardToChopperMoveConverter(tmpFile.getAbsolutePath())
-
-        when:
-        converter.processState(createBoardWithElementAt(5, 5, 9, Element.MEAT_CHOPPER))
-        converter.processState(createBoardWithElementAt(5, 5 + 1, 9, Element.MEAT_CHOPPER))
-
-        then:
-        def lines = FileUtils.readLines(tmpFile)
-        verifyLine(lines[1], "D", 0,0,0,0, "NA")
-    }
-
-    def "convert simple"() {
-        def board1 = createBoardWithElementAt(5, 5, 9, Element.MEAT_CHOPPER)
-        def board2 = createBoardWithElementAt(5, 5 + 1, 9, Element.MEAT_CHOPPER)
-        def board3 = createBoardWithElementAt(5, 5 + 2, 9, Element.MEAT_CHOPPER)
-
-        def converter = new BoardToChopperMoveConverter('out.csv')
-        when:
-        converter.processState(board1)
-        converter.processState(board2)
-        converter.processState(board3)
-
-
-        def lines = FileUtils.readLines(new File('out.csv'))
-
-        then:
-        verifyLine(lines[0], "NA", 0,0,0,0, "NA")
+        where:
+        boardStrings                                    | expectedLines
+        [board(5, 5, 9, MEAT_CHOPPER)] | ['NA,0,0,0,0,NA']
+        [board(5, 5, 9, MEAT_CHOPPER), board(5, 5 + 1, 9, MEAT_CHOPPER)] | ['NA,0,0,0,0,NA', 'D,0,0,0,0,NA']
     }
 
     def verifyLine(String line, String previousMove, int isUpOccupied, int isDownOccupied, int isLeftOccupied, int isRightOccupied, String nextMove) {
         def split = line.split('\\,')
         split[0] == previousMove &&
-        split[1] as int == isUpOccupied &&
-        split[2] as int == isDownOccupied &&
-        split[3] as int == isLeftOccupied &&
-        split[4] as int == isRightOccupied &&
-        split[5] == nextMove
+                split[1] as int == isUpOccupied &&
+                split[2] as int == isDownOccupied &&
+                split[3] as int == isLeftOccupied &&
+                split[4] as int == isRightOccupied &&
+                split[5] == nextMove
+    }
+
+    def verifyLine2(String line, String expectedLine) {
+        assert line == expectedLine
+    }
+
+    def verifyLine2() {
+        assert false
     }
 
 }

@@ -15,6 +15,10 @@ class TestUtils {
         setElement(width, x, y, element.char, chars)
     }
 
+    static String board(int x, int y, int width, Element element) {
+        createBoardWithElementAt(x, y, width, element)
+    }
+
     static String setElement(int width, int x, int y, char elementChar, char[] chars) {
         def point = y * (width + 2) + x
 

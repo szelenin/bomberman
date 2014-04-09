@@ -12,15 +12,6 @@ public class NearestChopperToBombHeuristic implements Heuristic {
         if (nearestBomb != null) {
             return -(Utils.minDistToElement(state, state.getBombs()).getValue1() + 1);
         }
-/*
-        //bomb is set
-        List<ElementState> bombs = state.getBombs();
-        if (bombs.isEmpty()) {
-            int minDist = distToclosestChopper(state);
-            return 5 + minDist;
-        }
-        return bombs.get(0).state.getChar() - '0';
-*/
         return Utils.distToclosestChopper(state);
     }
 
