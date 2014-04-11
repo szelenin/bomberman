@@ -26,15 +26,18 @@ public class BoardToChopperMoveConverter {
         GameState state = new GameState(boardString);
         if (previousMove != null && nextMove == null) {
             nextMove = calcMove(state);
+            FileUtils.writeStringToFile(outFile, previousMove + ",0,0,0,0," + nextMove + "\n", true);
+            previousState = state;
+            return;
         }
         if (previousMove == null && previousState != null) {
             previousMove = calcMove(state);
         }
 
         if (this.previousMove != null && this.nextMove != null) {
-            FileUtils.writeStringToFile(outFile, previousMove + ",0,0,0,0," + nextMove + "\n", true);
             previousMove = nextMove;
             nextMove = calcMove(state);
+            FileUtils.writeStringToFile(outFile, previousMove + ",0,0,0,0," + nextMove + "\n", true);
         }
         previousState = state;
     }
@@ -47,7 +50,13 @@ public class BoardToChopperMoveConverter {
 
     private String direction(Point prevPosition, Point currentPosition) {
         int yDiff = prevPosition.getY() - currentPosition.getY();
-
+        int xDiff = prevPosition.getX() - currentPosition.getX();
+        if (yDiff == 0 && xDiff == 0) {
+            return "S";
+        }
+        if (yDiff == 0) {
+            return xDiff < 0 ? "R" : "L";
+        }
         return yDiff < 0 ? "D" : "U";
     }
 }
