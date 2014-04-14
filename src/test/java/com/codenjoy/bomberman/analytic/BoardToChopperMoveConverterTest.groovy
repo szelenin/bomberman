@@ -4,7 +4,7 @@ import org.apache.commons.io.FileUtils
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import static com.codenjoy.bomberman.Element.*
+import static com.codenjoy.bomberman.Element.MEAT_CHOPPER
 import static com.codenjoy.bomberman.TestUtils.board
 
 /**
@@ -45,10 +45,18 @@ class BoardToChopperMoveConverterTest extends Specification {
         ['&'(5, 5), '&'(5 + 1, 5), '&'(5, 5)]                        | ['R,0,0,0,0,L']
         ['&'(5, 5), '&'(5 + 1, 5), '&'(5 + 1, 5)]                    | ['R,0,0,0,0,S']
         ['&'(5, 5), '&'(5 + 1, 5), '&'(5 + 1, 5 + 1), '&'(5, 5 + 1)] | ['R,0,0,0,0,D', 'D,0,0,0,0,L']
+        //2 choppers
+
     }
 
+/*
     def '&'(int x, int y) {
         board(x, y, 9, MEAT_CHOPPER)
+    }
+*/
+
+    def '&'(int... xy) {
+        board(9, MEAT_CHOPPER, xy)
     }
 
 
