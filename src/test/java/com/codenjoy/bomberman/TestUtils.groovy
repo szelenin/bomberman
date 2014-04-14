@@ -6,16 +6,11 @@ package com.codenjoy.bomberman
 class TestUtils {
 
     static String createBoardWithBomberAt(int x, int y, int width) {
-        createBoardWithElementAt(x, y, width, Element.BOMBERMAN)
+        createBoardWithElementAt(width, Element.BOMBERMAN, x, y)
     }
 
-    static String createBoardWithElementAt(int x, int y, int width, Element element) {
-        def chars = emptyBoard(width).chars
 
-        setElement(width, x, y, element.char, chars)
-    }
-
-    static String createBoardWithElementAt2(int width, Element element, int ... xy) {
+    static String createBoardWithElementAt(int width, Element element, int ... xy) {
         char[] chars = emptyBoard(width).chars
         int i = 0;
         while (i < xy.length) {
@@ -27,7 +22,7 @@ class TestUtils {
 
 
     static String board(int width, Element element, int ... xy) {
-        createBoardWithElementAt2(width, element, xy)
+        createBoardWithElementAt(width, element, xy)
     }
 
     static String setElement(int width, int x, int y, char elementChar, char[] chars) {

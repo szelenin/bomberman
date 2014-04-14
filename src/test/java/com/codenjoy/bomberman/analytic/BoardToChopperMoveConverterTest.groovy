@@ -49,11 +49,6 @@ class BoardToChopperMoveConverterTest extends Specification {
 
     }
 
-/*
-    def '&'(int x, int y) {
-        board(x, y, 9, MEAT_CHOPPER)
-    }
-*/
 
     def '&'(int... xy) {
         board(9, MEAT_CHOPPER, xy)
