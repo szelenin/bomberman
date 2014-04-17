@@ -46,11 +46,12 @@ class BoardToChopperMoveConverterTest extends Specification {
         ['&'(5, 5), '&'(5 + 1, 5), '&'(5 + 1, 5)]                    | ['R,0,0,0,0,S']
         ['&'(5, 5), '&'(5 + 1, 5), '&'(5 + 1, 5 + 1), '&'(5, 5 + 1)] | ['R,0,0,0,0,D', 'D,0,0,0,0,L']
         //2 choppers
+        ['&'(6, 6, 3, 3), '&'(6, 5, 3, 4), '&'(6, 4, 3, 5)] | ['D,0,0,0,0,D', 'U,0,0,0,0,U']
 
     }
 
 
-    def '&'(int... xy) {
+    def '&'(int ... xy) {
         board(9, MEAT_CHOPPER, xy)
     }
 
