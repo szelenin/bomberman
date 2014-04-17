@@ -35,6 +35,9 @@ public class BoardToChopperMoveConverter {
             ElementState currentChopper = state.getChoppers().get(i);
             Move move = getChopperMove(currentChopper, chopperMovesCopy);
             ElementState prevChopper = move.chopper;
+            if (prevChopper == null) {
+                continue;
+            }
 
             if (move.previousInitialized() && !move.nextInitialized()) {
                 move.next = calcMove(prevChopper, currentChopper);
@@ -43,7 +46,7 @@ public class BoardToChopperMoveConverter {
                 continue;
             }
 
-            if (!move.previousInitialized() && prevChopper != null) {
+            if (!move.previousInitialized()) {
                 String prevMove = calcMove(prevChopper, currentChopper);
                 chopperMoves.add(new Move(prevMove, currentChopper));
                 continue;
