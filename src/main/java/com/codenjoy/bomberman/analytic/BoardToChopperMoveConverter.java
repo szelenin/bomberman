@@ -30,45 +30,71 @@ public class BoardToChopperMoveConverter {
 
     public void processState(String boardString) throws IOException {
         GameState state = new GameState(boardString);
+        ArrayList<Move> chopperMovesCopy = new ArrayList<Move>(chopperMoves);
         for (int i = 0; i < state.getChoppers().size(); i++) {
-
-            Move move = getMove(i);
-
             ElementState currentChopper = state.getChoppers().get(i);
-            ElementState prevChopper = findPrevChopper(i);
+            Move move = getChopperMove(currentChopper, chopperMovesCopy);
+            ElementState prevChopper = move.chopper;
+
             if (move.previousInitialized() && !move.nextInitialized()) {
                 move.next = calcMove(prevChopper, currentChopper);
+                move.chopper = currentChopper;
                 FileUtils.writeStringToFile(outFile, move.previous + ",0,0,0,0," + move.next + "\n", true);
                 continue;
             }
 
             if (!move.previousInitialized() && prevChopper != null) {
                 String prevMove = calcMove(prevChopper, currentChopper);
-                chopperMoves.add(new Move(prevMove));
+                chopperMoves.add(new Move(prevMove, currentChopper));
                 continue;
             }
 
             if (move.previousInitialized() && move.nextInitialized()) {
                 move.previous = move.next;
                 move.next = calcMove(prevChopper, currentChopper);
+                move.chopper = currentChopper;
                 FileUtils.writeStringToFile(outFile, move.previous + ",0,0,0,0," + move.next + "\n", true);
             }
         }
         previousState = state;
     }
 
-    private ElementState findPrevChopper(int i) {
+    private ElementState findPrevChopper(ElementState currentChopper) {
         if (previousState == null) {
             return null;
         }
-        return previousState.getChoppers().get(i);
+        ArrayList<ElementState> potentialChoppers = new ArrayList<ElementState>();
+        for (ElementState chopper : previousState.getChoppers()) {
+            if (manhattanDist(currentChopper, chopper) <= 1) {
+                potentialChoppers.add(chopper);
+            }
+        }
+
+        ElementState result = potentialChoppers.get(0);
+        return result;
     }
 
-    private Move getMove(int i) {
-        if (chopperMoves.size() - 1 < i) {
-            return new Move(null);
+    private int manhattanDist(ElementState currentChopper, ElementState prevChopper) {
+        return Math.abs(currentChopper.position.getX() - prevChopper.position.getX()) +
+                Math.abs(currentChopper.position.getY() - prevChopper.position.getY());
+    }
+
+    private Move getChopperMove(ElementState currentChopper, List<Move> chopperMoves) {
+        if (chopperMoves.isEmpty() && previousState == null) {
+            return new Move(null, null);
         }
-        return chopperMoves.get(i);
+        if (chopperMoves.isEmpty() && previousState != null) {
+            ElementState prevChopper = findPrevChopper(currentChopper);
+            return new Move(null, prevChopper);
+        }
+
+        ArrayList<Move> potentialMoves = new ArrayList<Move>();
+        for (Move move : chopperMoves) {
+            if (manhattanDist(currentChopper, move.chopper) <= 1) {
+                potentialMoves.add(move);
+            }
+        }
+        return potentialMoves.get(0);
     }
 
     private String calcMove(ElementState prevChopper, ElementState currentChopper) {
@@ -92,9 +118,11 @@ public class BoardToChopperMoveConverter {
     private class Move {
         String previous;
         String next;
+        public ElementState chopper;
 
-        public Move(String previous) {
+        public Move(String previous, ElementState chopper) {
             this.previous = previous;
+            this.chopper = chopper;
         }
 
         public boolean previousInitialized() {
