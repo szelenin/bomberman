@@ -4,7 +4,6 @@ import com.codenjoy.bomberman.ElementState;
 import com.codenjoy.bomberman.GameState;
 import com.codenjoy.bomberman.utils.Point;
 import org.apache.commons.io.FileUtils;
-import org.javatuples.Pair;
 
 import java.io.File;
 import java.io.IOException;
@@ -62,19 +61,15 @@ public class BoardToChopperMoveConverter {
         previousState = state;
     }
 
-    private ElementState findPrevChopper(ElementState currentChopper) {
-        if (previousState == null) {
-            return null;
-        }
-        ArrayList<ElementState> potentialChoppers = new ArrayList<ElementState>();
-        for (ElementState chopper : previousState.getChoppers()) {
-            if (manhattanDist(currentChopper, chopper) <= 1) {
-                potentialChoppers.add(chopper);
+    private <T> T findPrevChopper(ElementState currentChopper, List<T> elements, ListElementAdaptor<T> adaptor) {
+        ArrayList<T> potentialChoppers = new ArrayList<T>();
+        for (T element : elements) {
+            if (manhattanDist(currentChopper, adaptor.getElement(element)) <= 1) {
+                potentialChoppers.add(element);
             }
         }
 
-        ElementState result = potentialChoppers.get(0);
-        return result;
+        return potentialChoppers.get(0);
     }
 
     private int manhattanDist(ElementState currentChopper, ElementState prevChopper) {
@@ -87,17 +82,10 @@ public class BoardToChopperMoveConverter {
             return new Move(null, null);
         }
         if (chopperMoves.isEmpty() && previousState != null) {
-            ElementState prevChopper = findPrevChopper(currentChopper);
+            ElementState prevChopper = findPrevChopper(currentChopper, previousState.getChoppers(), new ElementAdaptor());
             return new Move(null, prevChopper);
         }
-
-        ArrayList<Move> potentialMoves = new ArrayList<Move>();
-        for (Move move : chopperMoves) {
-            if (manhattanDist(currentChopper, move.chopper) <= 1) {
-                potentialMoves.add(move);
-            }
-        }
-        return potentialMoves.get(0);
+        return findPrevChopper(currentChopper, chopperMoves, new MoveAdaptor());
     }
 
     private String calcMove(ElementState prevChopper, ElementState currentChopper) {
@@ -134,6 +122,26 @@ public class BoardToChopperMoveConverter {
 
         public boolean nextInitialized() {
             return next != null;
+        }
+    }
+
+    private interface ListElementAdaptor<T> {
+        ElementState getElement(T collectionElement);
+    }
+
+    private class MoveAdaptor implements ListElementAdaptor<Move> {
+
+        @Override
+        public ElementState getElement(Move move) {
+            return move.chopper;
+        }
+    }
+
+    private class ElementAdaptor implements ListElementAdaptor<ElementState> {
+
+        @Override
+        public ElementState getElement(ElementState element) {
+            return element;
         }
     }
 }
