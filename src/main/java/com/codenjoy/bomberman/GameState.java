@@ -18,7 +18,7 @@ public class GameState {
     private List<ElementState> choppers = new ArrayList<ElementState>();
     private List<ElementState> explosion = new ArrayList<ElementState>();
 
-    private ElementState bomber;
+    private ElementState bomber = new ElementState(new Point(-1,-1), BOMBERMAN);
 
     private LengthToXY toXY;
     //0-WALL, 1-DESTROY_WALL, 2-DESTROYED_WALL
@@ -218,7 +218,7 @@ public class GameState {
         return bomber.position;
     }
 
-    Element at(int x, int y) {
+    public Element at(int x, int y) {
         if (bomber.position.getX() == x && bomber.position.getY() == y) {
             return bomber.state;
         }

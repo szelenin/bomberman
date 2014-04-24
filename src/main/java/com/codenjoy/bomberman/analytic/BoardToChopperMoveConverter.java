@@ -1,5 +1,6 @@
 package com.codenjoy.bomberman.analytic;
 
+import com.codenjoy.bomberman.Element;
 import com.codenjoy.bomberman.ElementState;
 import com.codenjoy.bomberman.GameState;
 import com.codenjoy.bomberman.utils.Point;
@@ -8,7 +9,9 @@ import org.apache.commons.io.FileUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by szelenin on 4/7/14.
@@ -17,14 +20,14 @@ import java.util.List;
 public class BoardToChopperMoveConverter {
     private File outFile;
     private GameState previousState;
-    private boolean previousInitialized;
-    private boolean nextInitialized;
-    //value0 - previousMove, value1 - nextMove
     private List<Move> chopperMoves = new ArrayList<Move>();
+    private Map<Element, Character> elementMap = new HashMap<Element, Character>();
 
     public BoardToChopperMoveConverter(String outFilePath) throws IOException {
         this.outFile = new File(outFilePath);
-        FileUtils.writeStringToFile(outFile, "Previous,UpOccupied,RightOccupied,DownOccupied,LeftOccupied,Next\n", false);
+        elementMap.put(Element.WALL, 'W');
+        elementMap.put(Element.SPACE, '0');
+        FileUtils.writeStringToFile(outFile, "Previous,Up,Right,Down,Left,Next\n", false);
     }
 
     public void processState(String boardString) throws IOException {
@@ -41,7 +44,7 @@ public class BoardToChopperMoveConverter {
             if (move.previousInitialized() && !move.nextInitialized()) {
                 move.next = calcMove(prevChopper, currentChopper);
                 move.chopper = currentChopper;
-                FileUtils.writeStringToFile(outFile, move.previous + ",0,0,0,0," + move.next + "\n", true);
+                FileUtils.writeStringToFile(outFile, move.previous + ',' + occupied(prevChopper, previousState) + ',' + move.next + "\n", true);
                 continue;
             }
 
@@ -55,10 +58,24 @@ public class BoardToChopperMoveConverter {
                 move.previous = move.next;
                 move.next = calcMove(prevChopper, currentChopper);
                 move.chopper = currentChopper;
-                FileUtils.writeStringToFile(outFile, move.previous + ",0,0,0,0," + move.next + "\n", true);
+                FileUtils.writeStringToFile(outFile, move.previous + ',' + occupied(prevChopper, previousState) + ',' + move.next + "\n", true);
             }
         }
         previousState = state;
+    }
+
+
+    private String occupied(ElementState chopper, GameState state) {
+        Element up = state.at(chopper.position.getX(), chopper.position.getY() - 1);
+        Element right = state.at(chopper.position.getX() + 1, chopper.position.getY());
+        Element down = state.at(chopper.position.getX(), chopper.position.getY() + 1);
+        Element left = state.at(chopper.position.getX() - 1, chopper.position.getY());
+        StringBuilder sb = new StringBuilder();
+        sb.append(elementMap.get(up)).append(",")
+                .append(elementMap.get(right)).append(",")
+                .append(elementMap.get(down)).append(",")
+                .append(elementMap.get(left));
+        return sb.toString();
     }
 
     private <T> T findPrevChopper(ElementState currentChopper, List<T> elements, ListElementAdaptor<T> adaptor) {
@@ -68,7 +85,6 @@ public class BoardToChopperMoveConverter {
                 potentialChoppers.add(element);
             }
         }
-
         return potentialChoppers.get(0);
     }
 
