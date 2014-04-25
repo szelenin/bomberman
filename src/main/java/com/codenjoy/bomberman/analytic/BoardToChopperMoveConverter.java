@@ -1,5 +1,6 @@
 package com.codenjoy.bomberman.analytic;
 
+import com.codenjoy.bomberman.Action;
 import com.codenjoy.bomberman.Element;
 import com.codenjoy.bomberman.ElementState;
 import com.codenjoy.bomberman.GameState;
@@ -26,7 +27,9 @@ public class BoardToChopperMoveConverter {
     public BoardToChopperMoveConverter(String outFilePath) throws IOException {
         this.outFile = new File(outFilePath);
         elementMap.put(Element.WALL, 'W');
+        elementMap.put(Element.DESTROY_WALL, 'W');
         elementMap.put(Element.SPACE, '0');
+        elementMap.put(Element.MEAT_CHOPPER, 'C');
         FileUtils.writeStringToFile(outFile, "Previous,Up,Right,Down,Left,Next\n", false);
     }
 
@@ -81,9 +84,20 @@ public class BoardToChopperMoveConverter {
     private <T> T findPrevChopper(ElementState currentChopper, List<T> elements, ListElementAdaptor<T> adaptor) {
         ArrayList<T> potentialChoppers = new ArrayList<T>();
         for (T element : elements) {
-            if (manhattanDist(currentChopper, adaptor.getElement(element)) <= 1) {
+            ElementState prevChopper = adaptor.getElement(element);
+            List<Action> legalActions = previousState.getLegalActions(prevChopper);
+            for (Action action : legalActions) {
+                int x = action.changeX(prevChopper.position.getX());
+                int y = action.changeY(prevChopper.position.getY());
+                if (currentChopper.position.getX() == x && currentChopper.position.getY() == y) {
+                    potentialChoppers.add(element);
+                }
+            }
+/*
+            if (manhattanDist(currentChopper, prevChopper) <= 1) {
                 potentialChoppers.add(element);
             }
+*/
         }
         return potentialChoppers.get(0);
     }

@@ -1,5 +1,6 @@
 package com.codenjoy.bomberman.analytic
 
+import com.codenjoy.bomberman.Element
 import org.apache.commons.io.FileUtils
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -40,6 +41,7 @@ class BoardToChopperMoveConverterTest extends Specification {
         }
         where:
         boardStrings                                                 | expectedLines
+/*
         ['&'(5,5)]| []
         ['&'(5, 5)]                                                  | []
         ['&'(5, 5), '&'(5, 5 + 1)]                                   | []
@@ -55,7 +57,10 @@ class BoardToChopperMoveConverterTest extends Specification {
         ['&'(2, 2)._(WALL, 4, 2), '&'(3, 2)._(WALL, 4, 2), '&'(2, 2)._(WALL, 4, 2)] | ['R,0,W,0,0,L']
         ['&'(2, 2)._(WALL, 2, 4), '&'(2, 3)._(WALL, 2, 4), '&'(2, 2)._(WALL, 2, 4)] | ['D,0,0,W,0,U']
         ['&'(4, 2)._(WALL, 2, 2), '&'(3, 2)._(WALL, 2, 2), '&'(4, 2)._(WALL, 2, 2)] | ['L,0,0,0,W,R']
+        ['&'(4, 2)._(DESTROY_WALL, 2, 2), '&'(3, 2)._(DESTROY_WALL, 2, 2), '&'(4, 2)._(DESTROY_WALL, 2, 2)] | ['L,0,0,0,W,R']
+*/
 
+        ['&'(4, 2)._(MEAT_CHOPPER, 2, 2), '&'(3, 2)._(MEAT_CHOPPER, 2, 2), '&'(4, 2)._(MEAT_CHOPPER, 2, 2)] | ['S,0,C,0,0,S', 'L,0,0,0,C,R']
     }
 
 

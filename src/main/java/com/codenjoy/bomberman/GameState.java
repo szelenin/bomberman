@@ -18,7 +18,7 @@ public class GameState {
     private List<ElementState> choppers = new ArrayList<ElementState>();
     private List<ElementState> explosion = new ArrayList<ElementState>();
 
-    private ElementState bomber = new ElementState(new Point(-1,-1), BOMBERMAN);
+    private ElementState bomber = new ElementState(new Point(-1, -1), BOMBERMAN);
 
     private LengthToXY toXY;
     //0-WALL, 1-DESTROY_WALL, 2-DESTROYED_WALL
@@ -113,17 +113,27 @@ public class GameState {
     }
 
     public List<Action> getLegalActions() {
+        return getLegalActions(bomber);
+    }
+
+    public List<Action> getLegalActions(ElementState element) {
         ArrayList<Action> result = new ArrayList<Action>(Arrays.asList(Action.values()));
 
         for (Action action : Action.values()) {
-            int x = action.changeX(bomber.position.getX());
-            int y = action.changeY(bomber.position.getY());
+            int x = action.changeX(element.position.getX());
+            int y = action.changeY(element.position.getY());
             int bitNo = toXY.getLength(x, y);
             for (int i = 0; i < 2; i++) {
                 if (walls[i].getBit(bitNo)) {
                     result.remove(action);
                 }
-                if (onOtherBomber(x, y)) {
+                if (element.state == BOMBERMAN || element.state == BOMB_BOMBERMAN) {
+                    if (onOtherBomber(x, y)) {
+                        result.remove(action);
+                    }
+                }
+
+                if (element.state == MEAT_CHOPPER && action == Action.ACT) {
                     result.remove(action);
                 }
             }
@@ -196,7 +206,7 @@ public class GameState {
     }
 
     private void addExplosionIfNoWall(GameState newGameState, int x, int y) {
-        if (x < 0 || y < 0 || x >= toXY.boardSize || y >=toXY.boardSize) {
+        if (x < 0 || y < 0 || x >= toXY.boardSize || y >= toXY.boardSize) {
             return;
         }
         Element element = newGameState.at(x, y);
