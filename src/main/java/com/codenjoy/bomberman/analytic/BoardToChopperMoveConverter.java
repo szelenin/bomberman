@@ -41,8 +41,7 @@ public class BoardToChopperMoveConverter {
             if (!move.previousInitialized() || !move.nextInitialized()) {
                 continue;
             }
-            Move prevMove = findPrevMove(move.chopper);
-            FileUtils.writeStringToFile(outFile, move.previous + ',' + occupied(prevMove.chopper, previousState) + ',' + move.next + "\n", true);
+            FileUtils.writeStringToFile(outFile, move.previous + ',' + occupied(move.prevMove.chopper, previousState) + ',' + move.next + "\n", true);
         }
         chopperMoves = moves;
         previousState = state;
@@ -53,19 +52,20 @@ public class BoardToChopperMoveConverter {
         List<Move> result = new ArrayList<Move>();
         for (ElementState chopper : choppers) {
             if (previousState == null) {
-                result.add(new Move(null, chopper));
+                result.add(new Move(null, null, chopper, null));
                 continue;
             }
             Move prevMove = findPrevMove(chopper);
             if (!prevMove.previousInitialized()) {
-                result.add(new Move(calcMove(prevMove.chopper, chopper), chopper));
+                Move currentMove = new Move(calcMove(prevMove.chopper, chopper), null, chopper, prevMove);
+                result.add(currentMove);
                 continue;
             }
             if (prevMove.previousInitialized() && !prevMove.nextInitialized()) {
-                result.add(new Move(prevMove.previous, calcMove(prevMove.chopper, chopper), chopper));
+                result.add(new Move(prevMove.previous, calcMove(prevMove.chopper, chopper), chopper, prevMove));
                 continue;
             }
-            result.add(new Move(prevMove.next, calcMove(prevMove.chopper, chopper), chopper));
+            result.add(new Move(prevMove.next, calcMove(prevMove.chopper, chopper), chopper, prevMove));
         }
         return result;
     }
@@ -127,16 +127,15 @@ public class BoardToChopperMoveConverter {
         String previous;
         String next;
         public ElementState chopper;
+        public Move prevMove;
 
-        public Move(String previous, ElementState chopper) {
-            this(previous, null, chopper);
-        }
-
-        public Move(String previous, String next, ElementState chopper) {
+        public Move(String previous, String next, ElementState chopper, Move prevMove) {
             this.previous = previous;
             this.next = next;
             this.chopper = chopper;
+            this.prevMove = prevMove;
         }
+
 
         public boolean previousInitialized() {
             return previous != null;
