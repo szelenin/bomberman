@@ -35,36 +35,59 @@ public class BoardToChopperMoveConverter {
 
     public void processState(String boardString) throws IOException {
         GameState state = new GameState(boardString);
-        ArrayList<Move> chopperMovesCopy = new ArrayList<Move>(chopperMoves);
-        for (int i = 0; i < state.getChoppers().size(); i++) {
-            ElementState currentChopper = state.getChoppers().get(i);
-            Move move = getChopperMove(currentChopper, chopperMovesCopy);
+
+        List<Move> moves = getChopperMoves(state);
+        for (Move move : moves) {
+            if (!move.previousInitialized() || !move.nextInitialized()) {
+                continue;
+            }
+            Move prevMove = findPrevMove(move.chopper);
+            FileUtils.writeStringToFile(outFile, move.previous + ',' + occupied(prevMove.chopper, previousState) + ',' + move.next + "\n", true);
+        }
+        chopperMoves = moves;
+        previousState = state;
+    }
+
+    private List<Move> getChopperMoves(GameState state) {
+        List<ElementState> choppers = state.getChoppers();
+        List<Move> result = new ArrayList<Move>();
+        for (ElementState chopper : choppers) {
+            if (previousState == null) {
+                result.add(new Move(null, chopper));
+                continue;
+            }
+            Move prevMove = findPrevMove(chopper);
+            if (!prevMove.previousInitialized()) {
+                result.add(new Move(calcMove(prevMove.chopper, chopper), chopper));
+                continue;
+            }
+            if (prevMove.previousInitialized() && !prevMove.nextInitialized()) {
+                result.add(new Move(prevMove.previous, calcMove(prevMove.chopper, chopper), chopper));
+                continue;
+            }
+            result.add(new Move(prevMove.next, calcMove(prevMove.chopper, chopper), chopper));
+        }
+        return result;
+    }
+
+    private Move findPrevMove(ElementState chopper) {
+        ArrayList<Move> potentialMoves = new ArrayList<Move>();
+        for (Move move : chopperMoves) {
             ElementState prevChopper = move.chopper;
-            if (prevChopper == null) {
-                continue;
+            if (prevChopper.equals(chopper)) {
+                return move;
             }
-
-            if (move.previousInitialized() && !move.nextInitialized()) {
-                move.next = calcMove(prevChopper, currentChopper);
-                move.chopper = currentChopper;
-                FileUtils.writeStringToFile(outFile, move.previous + ',' + occupied(prevChopper, previousState) + ',' + move.next + "\n", true);
-                continue;
-            }
-
-            if (!move.previousInitialized()) {
-                String prevMove = calcMove(prevChopper, currentChopper);
-                chopperMoves.add(new Move(prevMove, currentChopper));
-                continue;
-            }
-
-            if (move.previousInitialized() && move.nextInitialized()) {
-                move.previous = move.next;
-                move.next = calcMove(prevChopper, currentChopper);
-                move.chopper = currentChopper;
-                FileUtils.writeStringToFile(outFile, move.previous + ',' + occupied(prevChopper, previousState) + ',' + move.next + "\n", true);
+            List<Action> legalActions = previousState.getLegalActions(prevChopper);
+            for (Action action : legalActions) {
+                int x = action.changeX(prevChopper.position.getX());
+                int y = action.changeY(prevChopper.position.getY());
+                if (chopper.position.getX() == x && chopper.position.getY() == y) {
+                    potentialMoves.add(move);
+                }
             }
         }
-        previousState = state;
+        assert potentialMoves.size() == 1;
+        return potentialMoves.get(0);
     }
 
 
@@ -81,42 +104,6 @@ public class BoardToChopperMoveConverter {
         return sb.toString();
     }
 
-    private <T> T findPrevChopper(ElementState currentChopper, List<T> elements, ListElementAdaptor<T> adaptor) {
-        ArrayList<T> potentialChoppers = new ArrayList<T>();
-        for (T element : elements) {
-            ElementState prevChopper = adaptor.getElement(element);
-            List<Action> legalActions = previousState.getLegalActions(prevChopper);
-            for (Action action : legalActions) {
-                int x = action.changeX(prevChopper.position.getX());
-                int y = action.changeY(prevChopper.position.getY());
-                if (currentChopper.position.getX() == x && currentChopper.position.getY() == y) {
-                    potentialChoppers.add(element);
-                }
-            }
-/*
-            if (manhattanDist(currentChopper, prevChopper) <= 1) {
-                potentialChoppers.add(element);
-            }
-*/
-        }
-        return potentialChoppers.get(0);
-    }
-
-    private int manhattanDist(ElementState currentChopper, ElementState prevChopper) {
-        return Math.abs(currentChopper.position.getX() - prevChopper.position.getX()) +
-                Math.abs(currentChopper.position.getY() - prevChopper.position.getY());
-    }
-
-    private Move getChopperMove(ElementState currentChopper, List<Move> chopperMoves) {
-        if (chopperMoves.isEmpty() && previousState == null) {
-            return new Move(null, null);
-        }
-        if (chopperMoves.isEmpty() && previousState != null) {
-            ElementState prevChopper = findPrevChopper(currentChopper, previousState.getChoppers(), new ElementAdaptor());
-            return new Move(null, prevChopper);
-        }
-        return findPrevChopper(currentChopper, chopperMoves, new MoveAdaptor());
-    }
 
     private String calcMove(ElementState prevChopper, ElementState currentChopper) {
         Point prevPosition = prevChopper.position;
@@ -142,7 +129,12 @@ public class BoardToChopperMoveConverter {
         public ElementState chopper;
 
         public Move(String previous, ElementState chopper) {
+            this(previous, null, chopper);
+        }
+
+        public Move(String previous, String next, ElementState chopper) {
             this.previous = previous;
+            this.next = next;
             this.chopper = chopper;
         }
 
