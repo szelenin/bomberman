@@ -59,7 +59,7 @@ class BoardToChopperMoveConverterTest extends Specification {
         ['&'(4, 2)._(DESTROY_WALL, 2, 2), '&'(3, 2)._(DESTROY_WALL, 2, 2), '&'(4, 2)._(DESTROY_WALL, 2, 2)] | ['L,0,0,0,W,R']
 
         // special cases when previous move cannot be uniquely defined
-//        ['&'(4, 2)._(MEAT_CHOPPER, 2, 2), '&'(3, 2)._(MEAT_CHOPPER, 2, 2), '&'(4, 2)._(MEAT_CHOPPER, 2, 2)] | ['S,0,C,0,0,S', 'L,0,0,0,C,R']
+        ['&'(4, 2)._(MEAT_CHOPPER, 2, 2), '&'(3, 2)._(MEAT_CHOPPER, 2, 2), '&'(4, 2)._(MEAT_CHOPPER, 2, 2)] | ['S,0,C,0,0,S', 'L,0,0,0,C,R']
     }
 
 

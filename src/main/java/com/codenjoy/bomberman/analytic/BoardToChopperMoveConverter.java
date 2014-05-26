@@ -60,7 +60,8 @@ public class BoardToChopperMoveConverter {
 
     private List<Move> getChopperMoves(GameState state) {
         List<Move> result = new ArrayList<Move>();
-        List<VariableValue> previousMoves = findPreviousPotentialMoves(state);
+        List<VariableValue> previousMoves = resolveConstraints(findPreviousPotentialMoves(state));
+
         for (VariableValue variableValue : previousMoves) {
             if (previousState == null) {
                 result.add(new Move(null, null, variableValue.chopper, null));
@@ -79,6 +80,33 @@ public class BoardToChopperMoveConverter {
             result.add(new Move(prevMove.next, calcMove(prevMove.chopper, variableValue.chopper), variableValue.chopper, prevMove));
         }
         return result;
+    }
+
+    private List<VariableValue> resolveConstraints(List<VariableValue> previousPotentialMoves) {
+        List<VariableValue> resolved = new ArrayList<VariableValue>();
+        List<VariableValue> unresolved = new ArrayList<VariableValue>();
+        for (VariableValue potentialMove : previousPotentialMoves) {
+            if (potentialMove.previousMoves.size() <= 1) {
+                resolved.add(potentialMove);
+            } else {
+                unresolved.add(potentialMove);
+            }
+        }
+        for (VariableValue unresolvedVar : unresolved) {
+            Iterator<Move> iterator = unresolvedVar.previousMoves.iterator();
+            while (iterator.hasNext()) {
+                Move move = iterator.next();
+                for (VariableValue resolvedVar : resolved) {
+                    if (move.chopper.position.equals(resolvedVar.previousMoves.get(0).chopper.position)) {
+                        iterator.remove();
+                    }
+                }
+            }
+            if (unresolvedVar.previousMoves.size() == 1) {
+                resolved.add(unresolvedVar);
+            }
+        }
+        return resolved;
     }
 
     private List<Move> findPotentialMoves(ElementState chopper) {
