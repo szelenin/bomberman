@@ -6,13 +6,13 @@ import com.codenjoy.bomberman.ElementState;
 import com.codenjoy.bomberman.GameState;
 import com.codenjoy.bomberman.utils.Point;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by szelenin on 4/7/14.
@@ -23,6 +23,8 @@ public class BoardToChopperMoveConverter {
     private GameState previousState;
     private List<Move> chopperMoves = new ArrayList<Move>();
     private Map<Element, Character> elementMap = new HashMap<Element, Character>();
+
+    private static final Logger logger = LogManager.getLogger(BoardToChopperMoveConverter.class);
 
     public BoardToChopperMoveConverter(String outFilePath) throws IOException {
         this.outFile = new File(outFilePath);
@@ -47,35 +49,45 @@ public class BoardToChopperMoveConverter {
         previousState = state;
     }
 
-    private List<Move> getChopperMoves(GameState state) {
+    private List<VariableValue> findPreviousPotentialMoves(GameState state) {
+        List<VariableValue> result = new ArrayList<VariableValue>();
         List<ElementState> choppers = state.getChoppers();
-        List<Move> result = new ArrayList<Move>();
         for (ElementState chopper : choppers) {
-            if (previousState == null) {
-                result.add(new Move(null, null, chopper, null));
-                continue;
-            }
-            Move prevMove = findPrevMove(chopper);
-            if (!prevMove.previousInitialized()) {
-                Move currentMove = new Move(calcMove(prevMove.chopper, chopper), null, chopper, prevMove);
-                result.add(currentMove);
-                continue;
-            }
-            if (prevMove.previousInitialized() && !prevMove.nextInitialized()) {
-                result.add(new Move(prevMove.previous, calcMove(prevMove.chopper, chopper), chopper, prevMove));
-                continue;
-            }
-            result.add(new Move(prevMove.next, calcMove(prevMove.chopper, chopper), chopper, prevMove));
+            result.add(new VariableValue(chopper, findPotentialMoves(chopper)));
         }
         return result;
     }
 
-    private Move findPrevMove(ElementState chopper) {
+    private List<Move> getChopperMoves(GameState state) {
+        List<Move> result = new ArrayList<Move>();
+        List<VariableValue> previousMoves = findPreviousPotentialMoves(state);
+        for (VariableValue variableValue : previousMoves) {
+            if (previousState == null) {
+                result.add(new Move(null, null, variableValue.chopper, null));
+                continue;
+            }
+            Move prevMove = variableValue.previousMoves.get(0);
+            if (!prevMove.previousInitialized()) {
+                Move currentMove = new Move(calcMove(prevMove.chopper, variableValue.chopper), null, variableValue.chopper, prevMove);
+                result.add(currentMove);
+                continue;
+            }
+            if (prevMove.previousInitialized() && !prevMove.nextInitialized()) {
+                result.add(new Move(prevMove.previous, calcMove(prevMove.chopper, variableValue.chopper), variableValue.chopper, prevMove));
+                continue;
+            }
+            result.add(new Move(prevMove.next, calcMove(prevMove.chopper, variableValue.chopper), variableValue.chopper, prevMove));
+        }
+        return result;
+    }
+
+    private List<Move> findPotentialMoves(ElementState chopper) {
         ArrayList<Move> potentialMoves = new ArrayList<Move>();
         for (Move move : chopperMoves) {
             ElementState prevChopper = move.chopper;
             if (prevChopper.equals(chopper)) {
-                return move;
+                logger.trace("Var: {}, Domain: [{}]", chopper, move);
+                return Collections.singletonList(move);
             }
             List<Action> legalActions = previousState.getLegalActions(prevChopper);
             for (Action action : legalActions) {
@@ -86,10 +98,9 @@ public class BoardToChopperMoveConverter {
                 }
             }
         }
-        assert potentialMoves.size() == 1;
-        return potentialMoves.get(0);
+        logger.trace("Var: {}, Domain: {}", chopper, potentialMoves);
+        return potentialMoves;
     }
-
 
     private String occupied(ElementState chopper, GameState state) {
         Element up = state.at(chopper.position.getX(), chopper.position.getY() - 1);
@@ -144,25 +155,20 @@ public class BoardToChopperMoveConverter {
         public boolean nextInitialized() {
             return next != null;
         }
-    }
-
-    private interface ListElementAdaptor<T> {
-        ElementState getElement(T collectionElement);
-    }
-
-    private class MoveAdaptor implements ListElementAdaptor<Move> {
 
         @Override
-        public ElementState getElement(Move move) {
-            return move.chopper;
+        public String toString() {
+            return (prevMove == null ? "null" : prevMove.chopper) + "->" + chopper;
         }
     }
 
-    private class ElementAdaptor implements ListElementAdaptor<ElementState> {
+    class VariableValue {
+        public ElementState chopper;
+        public List<Move> previousMoves;
 
-        @Override
-        public ElementState getElement(ElementState element) {
-            return element;
+        private VariableValue(ElementState chopper, List<Move> previousMoves) {
+            this.chopper = chopper;
+            this.previousMoves = previousMoves;
         }
     }
 }

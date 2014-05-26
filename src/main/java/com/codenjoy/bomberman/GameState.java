@@ -4,7 +4,6 @@ import com.codenjoy.bomberman.utils.BitElements;
 import com.codenjoy.bomberman.utils.Board;
 import com.codenjoy.bomberman.utils.LengthToXY;
 import com.codenjoy.bomberman.utils.Point;
-import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 

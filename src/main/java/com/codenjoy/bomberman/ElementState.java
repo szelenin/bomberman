@@ -3,6 +3,8 @@ package com.codenjoy.bomberman;
 import com.codenjoy.bomberman.utils.Point;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.StandardToStringStyle;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
  * Created by szelenin on 3/7/14.
@@ -36,6 +38,11 @@ public class ElementState {
     public boolean equals(Object obj) {
         ElementState other = (ElementState) obj;
         return new EqualsBuilder().append(state, other.state).append(position, other.position).isEquals();
+    }
+
+    @Override
+    public String toString() {
+        return "" + state.getChar() +  position;
     }
 
     @Override
