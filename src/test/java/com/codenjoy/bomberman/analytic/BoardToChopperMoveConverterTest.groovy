@@ -41,7 +41,7 @@ class BoardToChopperMoveConverterTest extends Specification {
         }
         where:
         boardStrings                                                 | expectedLines
-        ['&'(5,5)]| []
+        ['&'(5, 5)]                                                  | []
         ['&'(5, 5)]                                                  | []
         ['&'(5, 5), '&'(5, 5 + 1)]                                   | []
         ['&'(5, 5), '&'(5, 5 + 1), '&'(5, 5)]                        | ['D,0,0,0,0,U']
@@ -57,14 +57,26 @@ class BoardToChopperMoveConverterTest extends Specification {
         ['&'(2, 2)._(WALL, 2, 4), '&'(2, 3)._(WALL, 2, 4), '&'(2, 2)._(WALL, 2, 4)] | ['D,0,0,W,0,U']
         ['&'(4, 2)._(WALL, 2, 2), '&'(3, 2)._(WALL, 2, 2), '&'(4, 2)._(WALL, 2, 2)] | ['L,0,0,0,W,R']
         ['&'(4, 2)._(DESTROY_WALL, 2, 2), '&'(3, 2)._(DESTROY_WALL, 2, 2), '&'(4, 2)._(DESTROY_WALL, 2, 2)] | ['L,0,0,0,W,R']
+        ['&'(1, 2)._(OTHER_BOMBERMAN, 3, 2), '&'(2, 2)._(OTHER_BOMBERMAN, 3, 2), '&'(3, 2), '&'(4,2)._(DEAD_BOMBERMAN, 3, 2)] | ['R,0,B,0,0,R', 'R,0,0,0,0,R']
+        ['&'(1, 2)._(BOMBERMAN, 3, 2), '&'(2, 2)._(BOMBERMAN, 3, 2), '&'(3, 2), '&'(4,2)._(DEAD_BOMBERMAN, 3, 2)] | ['R,0,B,0,0,R', 'R,0,0,0,0,R']
 
         // special cases when previous move cannot be uniquely defined
         ['&'(4, 2)._(MEAT_CHOPPER, 2, 2), '&'(3, 2)._(MEAT_CHOPPER, 2, 2), '&'(4, 2)._(MEAT_CHOPPER, 2, 2)] | ['S,0,C,0,0,S', 'L,0,0,0,C,R']
+        // one chopper died
+        ['&'(1, 2)._(BOMB_TIMER_2, 3,2), '&'(2, 2)._(BOMB_TIMER_1, 3,2), 'x'(3, 2)._(BOOM, 4,2)] | ['R,0,1,0,0,R']
+
+        ['&'(1, 2)._(MEAT_CHOPPER, 1, 1)._(BOMB_TIMER_1, 2,1),
+         '&'(2, 2)._(DEAD_MEAT_CHOPPER, 2, 1)._(BOOM, 3,1),
+         '&'(3, 2)] | ['R,C,0,0,0,R', 'R,W,BOOM,C,0,DEATH']
     }
 
 
     def '&'(int ... xy) {
         new SWrapper(board(DEFAULT_WIDTH, MEAT_CHOPPER, xy))
+    }
+
+    def 'x'(int ... xy) {
+        new SWrapper(board(DEFAULT_WIDTH, DEAD_MEAT_CHOPPER, xy))
     }
 
     def verifyLine(String line, String expectedLine) {

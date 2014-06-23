@@ -6,7 +6,6 @@ import com.codenjoy.bomberman.ElementState;
 import com.codenjoy.bomberman.GameState;
 import com.codenjoy.bomberman.utils.Point;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -22,16 +21,24 @@ public class BoardToChopperMoveConverter {
     private File outFile;
     private GameState previousState;
     private List<Move> chopperMoves = new ArrayList<Move>();
-    private Map<Element, Character> elementMap = new HashMap<Element, Character>();
+    private Map<Element, String> elementMap = new HashMap<Element, String>();
 
     private static final Logger logger = LogManager.getLogger(BoardToChopperMoveConverter.class);
 
     public BoardToChopperMoveConverter(String outFilePath) throws IOException {
         this.outFile = new File(outFilePath);
-        elementMap.put(Element.WALL, 'W');
-        elementMap.put(Element.DESTROY_WALL, 'W');
-        elementMap.put(Element.SPACE, '0');
-        elementMap.put(Element.MEAT_CHOPPER, 'C');
+        elementMap.put(Element.WALL, "W");
+        elementMap.put(Element.DESTROY_WALL, "W");
+        elementMap.put(Element.SPACE, "0");
+        elementMap.put(Element.MEAT_CHOPPER, "C");
+        elementMap.put(Element.DEAD_MEAT_CHOPPER, "C");
+        elementMap.put(Element.OTHER_BOMBERMAN, "B");
+        elementMap.put(Element.BOMBERMAN, "B");
+        elementMap.put(Element.BOMB_TIMER_1, "1");
+        elementMap.put(Element.BOMB_TIMER_2, "2");
+        elementMap.put(Element.BOMB_TIMER_3, "3");
+        elementMap.put(Element.BOMB_TIMER_4, "4");
+        elementMap.put(Element.BOOM, "BOOM");
         FileUtils.writeStringToFile(outFile, "Previous,Up,Right,Down,Left,Next\n", false);
     }
 
@@ -55,6 +62,11 @@ public class BoardToChopperMoveConverter {
         for (ElementState chopper : choppers) {
             result.add(new VariableValue(chopper, findPotentialMoves(chopper)));
         }
+        for (Move prevMove : chopperMoves) {
+            if (prevMove.chopper.isDead()) {
+                result.add(new VariableValue(prevMove.chopper, Arrays.asList(prevMove)));
+            }
+        }
         return result;
     }
 
@@ -68,6 +80,9 @@ public class BoardToChopperMoveConverter {
                 continue;
             }
             Move prevMove = variableValue.previousMoves.get(0);
+            if (variableValue.previousMoves.size() > 1) {
+                logger.error("Multiple values for var {}. Board: {}", variableValue, state);
+            }
             if (!prevMove.previousInitialized()) {
                 Move currentMove = new Move(calcMove(prevMove.chopper, variableValue.chopper), null, variableValue.chopper, prevMove);
                 result.add(currentMove);
@@ -147,14 +162,10 @@ public class BoardToChopperMoveConverter {
     private String calcMove(ElementState prevChopper, ElementState currentChopper) {
         Point prevPosition = prevChopper.position;
         Point currentPosition = currentChopper.position;
-        return direction(prevPosition, currentPosition);
-    }
-
-    private String direction(Point prevPosition, Point currentPosition) {
         int yDiff = prevPosition.getY() - currentPosition.getY();
         int xDiff = prevPosition.getX() - currentPosition.getX();
         if (yDiff == 0 && xDiff == 0) {
-            return "S";
+            return currentChopper.isDead() ? "DEATH" : "S";
         }
         if (yDiff == 0) {
             return xDiff < 0 ? "R" : "L";
@@ -197,6 +208,11 @@ public class BoardToChopperMoveConverter {
         private VariableValue(ElementState chopper, List<Move> previousMoves) {
             this.chopper = chopper;
             this.previousMoves = previousMoves;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("Var: %s, Domain: %s", chopper, previousMoves);
         }
     }
 }
