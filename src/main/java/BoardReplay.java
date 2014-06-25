@@ -2,12 +2,10 @@ import com.codenjoy.bomberman.*;
 import com.codenjoy.bomberman.Action;
 import com.codenjoy.bomberman.utils.*;
 import com.codenjoy.bomberman.utils.Point;
-import com.sun.org.apache.bcel.internal.generic.BIPUSH;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -26,6 +24,12 @@ public class BoardReplay extends JFrame {
     private int counter = 1;
 
     public BoardReplay() throws IOException {
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        setSize(34 * 24, 34 * 24);
+        setVisible(true);
+        BoardPanel pane = new BoardPanel();
+        add(pane);
+
         elementToFile.put(BOMB_BOMBERMAN, "bomb_bomberman.png");
         elementToFile.put(BOMB_TIMER_1, "bomb_one.png");
         elementToFile.put(BOMB_TIMER_2, "bomb_two.png");
@@ -49,27 +53,6 @@ public class BoardReplay extends JFrame {
         }
     }
 
-    public static void main(String[] args) throws IOException, InterruptedException {
-        BoardReplay boardReplay = buildFrame();
-//        boardReplay.setSize(640, 480);
-        boardReplay.setVisible(true);
-
-        BoardPanel pane = boardReplay.new BoardPanel();
-        boardReplay.add(pane);
-        String boardString = "☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼### &#  ##       ##      #    &☼☼#☼ ☼ ☼ ☼ ☼#☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼#☼☼♥## #     # #  #            #  ☼☼#☼ ☼#☼&☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼☼  #   #                        ☼☼ ☼#☼ ☼ ☼ ☼ ☼ ☼&☼ ☼ ☼ ☼#☼ ☼ ☼ ☼#☼☼    # ##           #           ☼☼ ☼#☼#☼ ☼ ☼ ☼♥☼ ☼#☼#☼ ☼ ☼ ☼ ☼ ☼ ☼☼##                     ♥       ☼☼#☼ ☼#☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼#☼☼ #                   #         ☼☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼#☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼☼          ## ### #          #  ☼☼ ☼ ☼ ☼ ☼&☼#☼#☼#☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼#☼☼ #     #       #         #     ☼☼#☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼☼              #     #          ☼☼#☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼#☼ ☼ ☼ ☼ ☼ ☼☼ &                  #      ####☼☼#☼ ☼ ☼ ☼ ☼ ☼ ☼#☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼☼#   #    #       #   # #       ☼☼ ☼ ☼#☼ ☼ ☼#☼ ☼♥☼ ☼ ☼#☼ ☼ ☼ ☼ ☼ ☼☼      #  #       ☺         ## #☼☼ ☼ ☼#☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼#☼ ☼ ☼ ☼ ☼ ☼☼    #                          ☼☼ ☼#☼ ☼ ☼ ☼#☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼ ☼&☼ ☼☼    &                          ☼☼ ☼ ☼ ☼#☼ ☼ ☼&☼ ☼ ☼ ☼ ☼#☼ ☼#☼ ☼ ☼☼ #                 #      #  ##☼☼ ☼ ☼#☼#☼ ☼ ☼ ☼#☼#☼ ☼&☼ ☼#☼ ☼ ☼ ☼☼       #   #     ##   ##  #    ☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼";
-        boardReplay.drawBoard(boardString, 33);
-
-        GameState state = new GameState(boardString);
-        List<Action> actions = new AstarSearch(new NearestChopperToBombHeuristic()).search(new Problem(state));
-        for (Action action : actions) {
-            Thread.sleep(200);
-            System.out.println("action = " + action);
-            state = state.generateSuccessor(action);
-            boardReplay.drawBoard(state.toString().replaceAll("\\n", ""), 33);
-            boardReplay.repaint();
-        }
-
-    }
 
     private class BoardPanel extends JPanel{
         @Override
@@ -80,20 +63,12 @@ public class BoardReplay extends JFrame {
 
     }
 
-    private static BoardReplay buildFrame() throws IOException {
-        BoardReplay frame = new BoardReplay();
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.setSize(34 * 24, 34 * 24);
-        frame.setVisible(true);
-        return frame;
-    }
-
     @Override
     public void paint(Graphics g) {
         g.drawImage(buffer, 0, 0, this);
     }
 
-    private void drawBoard(String boardString, int boardSize) throws IOException {
+    public void drawBoard(String boardString, int boardSize) throws IOException {
         int spriteWidth = images[0].getWidth();
         int spriteHeight = images[0].getHeight();
         buffer = new BufferedImage(spriteWidth * (boardSize + 1), spriteHeight * (boardSize + 1), BufferedImage.TYPE_INT_ARGB);

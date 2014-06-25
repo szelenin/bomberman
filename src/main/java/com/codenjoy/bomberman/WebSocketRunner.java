@@ -1,5 +1,6 @@
 package com.codenjoy.bomberman;
 
+import com.codenjoy.bomberman.analytic.BoardToChopperMoveConverter;
 import com.codenjoy.bomberman.utils.Board;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jetty.websocket.WebSocket;
@@ -9,6 +10,8 @@ import javax.rmi.CORBA.Util;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -53,6 +56,9 @@ public class WebSocketRunner {
     }
 
     private void start(String server, String userName) throws Exception {
+        final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yy");
+        final String currentDay = simpleDateFormat.format(new Date());
+        final BoardToChopperMoveConverter converter = new BoardToChopperMoveConverter(String.format("choppers-%s.txt", currentDay));
         final Pattern urlPattern = Pattern.compile("^board=(.*)$");
         factory = new WebSocketClientFactory();
         factory.start();
@@ -75,13 +81,14 @@ public class WebSocketRunner {
                 String boardString = matcher.group(1);
                 try {
                     GameState state = new GameState(boardString);
-                    FileUtils.write(new File("out.txt"), boardString+"\n", true);
+                    FileUtils.write(new File(String.format("out-%s.txt", currentDay)), boardString+"\n", true);
 
                     if (state.isDead()) {
                         System.out.println("DEAD!!!");
                     }
                     Action action = new AstarBombChoppersAgent().getAction(state);
                     connection.sendMessage(action.toString());
+                    converter.processState(boardString);
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (Exception e) {
