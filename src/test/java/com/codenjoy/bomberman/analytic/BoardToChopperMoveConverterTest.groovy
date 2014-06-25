@@ -68,6 +68,10 @@ class BoardToChopperMoveConverterTest extends Specification {
         ['&'(1, 2)._(MEAT_CHOPPER, 1, 1)._(BOMB_TIMER_1, 2,1),
          '&'(2, 2)._(DEAD_MEAT_CHOPPER, 2, 1)._(BOOM, 3,1),
          '&'(3, 2)] | ['R,C,0,0,0,R', 'R,W,BOOM,C,0,DEATH']
+
+        //dropped frame
+        ['&'(5, 5), '&'(5 + 2, 5), '&'(5 + 1, 5), '&'(5, 5)] | ['L,0,0,0,0,L']
+        ['&'(5, 5), '&'(5 + 1, 5), '&'(5 + 2, 5), '&'(5, 5), '&'(5, 5 + 1), '&'(5, 5 + 2)] | ['R,0,0,0,0,R', 'D,0,0,0,0,D']
     }
 
     def "prod investigation" (){

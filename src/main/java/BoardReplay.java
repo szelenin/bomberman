@@ -83,5 +83,6 @@ public class BoardReplay extends JFrame {
         File file = new File("board" + counter + ".gif");
         counter++;
         ImageIO.write(buffer, "gif", file);
+        repaint();
     }
 }

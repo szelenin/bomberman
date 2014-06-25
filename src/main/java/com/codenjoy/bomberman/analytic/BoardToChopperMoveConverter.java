@@ -73,12 +73,18 @@ public class BoardToChopperMoveConverter {
     private List<Move> getChopperMoves(GameState state) {
         List<Move> result = new ArrayList<Move>();
         List<VariableValue> previousMoves = resolveConstraints(findPreviousPotentialMoves(state));
-
+        logger.trace("PreviousMoves: {}", previousMoves);
         for (VariableValue variableValue : previousMoves) {
             if (previousState == null) {
                 result.add(new Move(null, null, variableValue.chopper, null));
                 continue;
             }
+
+            if (variableValue.previousMoves.isEmpty()) {
+                result.add(new Move(null, null, variableValue.chopper, null));
+                continue;
+            }
+
             Move prevMove = variableValue.previousMoves.get(0);
             if (variableValue.previousMoves.size() > 1) {
                 logger.error("Multiple values for var {}. Board: {}", variableValue, state);
