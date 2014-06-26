@@ -81,6 +81,7 @@ public class BoardToChopperMoveConverter {
             }
 
             if (variableValue.previousMoves.isEmpty()) {
+                logger.warn("Potential frame drop. Variable {}. Board: {}", variableValue, state);
                 result.add(new Move(null, null, variableValue.chopper, null));
                 continue;
             }
