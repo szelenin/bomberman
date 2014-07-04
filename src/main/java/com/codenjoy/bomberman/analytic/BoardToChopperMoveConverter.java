@@ -44,7 +44,7 @@ public class BoardToChopperMoveConverter {
 
     public void processState(String boardString) throws IOException {
         GameState state = new GameState(boardString);
-
+        logger.trace("Starting board {}", state);
         List<Move> moves = getChopperMoves(state);
         for (Move move : moves) {
             if (!move.previousInitialized() || !move.nextInitialized()) {
@@ -52,8 +52,22 @@ public class BoardToChopperMoveConverter {
             }
             FileUtils.writeStringToFile(outFile, move.previous + ',' + occupied(move.prevMove.chopper, previousState) + ',' + move.next + "\n", true);
         }
-        chopperMoves = moves;
+        chopperMoves = removeDead(moves);
         previousState = state;
+    }
+
+    private List<Move> removeDead(List<Move> moves) {
+        Iterator<Move> iterator = moves.iterator();
+        while (iterator.hasNext()) {
+            Move next = iterator.next();
+            if (next.prevMove == null) {
+                continue;
+            }
+            if (next.prevMove.chopper.isDead()) {
+                iterator.remove();
+            }
+        }
+        return moves;
     }
 
     private List<VariableValue> findPreviousPotentialMoves(GameState state) {
@@ -119,6 +133,10 @@ public class BoardToChopperMoveConverter {
             while (iterator.hasNext()) {
                 Move move = iterator.next();
                 for (VariableValue resolvedVar : resolved) {
+                    if (resolvedVar.previousMoves.isEmpty()) {
+                        logger.warn("No previous move for choper {}", resolvedVar.chopper);
+//                        continue;
+                    }
                     if (move.chopper.position.equals(resolvedVar.previousMoves.get(0).chopper.position)) {
                         iterator.remove();
                     }
