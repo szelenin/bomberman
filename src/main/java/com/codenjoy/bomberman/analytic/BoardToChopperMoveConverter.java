@@ -129,16 +129,16 @@ public class BoardToChopperMoveConverter {
             }
         }
         for (VariableValue unresolvedVar : unresolved) {
-            Iterator<Move> iterator = unresolvedVar.previousMoves.iterator();
-            while (iterator.hasNext()) {
-                Move move = iterator.next();
+            Iterator<Move> unresolvedIterator = unresolvedVar.previousMoves.iterator();
+            while (unresolvedIterator.hasNext()) {
+                Move unresolvedMove = unresolvedIterator.next();
                 for (VariableValue resolvedVar : resolved) {
                     if (resolvedVar.previousMoves.isEmpty()) {
                         logger.warn("No previous move for choper {}", resolvedVar.chopper);
-//                        continue;
+                        continue;
                     }
-                    if (move.chopper.position.equals(resolvedVar.previousMoves.get(0).chopper.position)) {
-                        iterator.remove();
+                    if (unresolvedMove.chopper.position.equals(resolvedVar.previousMoves.get(0).chopper.position)) {
+                        unresolvedIterator.remove();
                     }
                 }
             }
