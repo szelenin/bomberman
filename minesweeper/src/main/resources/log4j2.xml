@@ -6,7 +6,7 @@
         </File>
     </Appenders>
     <Loggers>
-        <logger name="com.codenjoy.bomberman" level="INFO"/>
+        <logger name="com.codenjoy.minesweeper" level="INFO"/>
         <Root level="INFO">
             <AppenderRef ref="File"/>
         </Root>

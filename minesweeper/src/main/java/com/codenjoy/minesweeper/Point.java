@@ -1,6 +1,5 @@
-package com.codenjoy.bomberman.utils;
+package com.codenjoy.minesweeper;
 
-import com.codenjoy.bomberman.Action;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**

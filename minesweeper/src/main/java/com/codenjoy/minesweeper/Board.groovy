@@ -1,12 +1,8 @@
-package com.codenjoy.bomberman.utils;
+package com.codenjoy.minesweeper;
 
-import com.codenjoy.bomberman.Element;
-
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import static com.codenjoy.bomberman.Element.*;
-import static com.codenjoy.bomberman.utils.Point.*;
+import static com.codenjoy.minesweeper.Element.*;
 
 /**
  * User: oleksandr.baglai
@@ -42,7 +38,7 @@ public class Board {
     }
 
     public boolean isAt(int x, int y, Element element) {
-        if (pt(x, y).isBad(size)) {
+        if (Point.pt(x, y).isBad(size)) {
             return false;
         }
         return getAt(x, y).equals(element);
@@ -79,7 +75,7 @@ public class Board {
         return result;
     }
 
-    private List<Point> findAll(Element element) {
+    private List<Point> findAll(Element... element) {
         List<Point> result = new LinkedList<Point>();
         for (int i = 0; i < size*size; i++) {
             Point pt = xyl.getXY(i);
@@ -105,18 +101,18 @@ public class Board {
     }
 
     public boolean isNear(int x, int y, Element element) {
-        if (pt(x, y).isBad(size)) {
+        if (Point.pt(x, y).isBad(size)) {
             return false;
         }
         return isAt(x + 1, y, element) || isAt(x - 1, y, element) || isAt(x, y + 1, element) || isAt(x, y - 1, element);
     }
 
     public boolean isBarrierAt(int x, int y) {
-        return getBarriers().contains(pt(x, y));
+        return getBarriers().contains(Point.pt(x, y));
     }
 
     public int countNear(int x, int y, Element element) {
-        if (pt(x, y).isBad(size)) {
+        if (Point.pt(x, y).isBad(size)) {
             return 0;
         }
         int count = 0;
@@ -125,5 +121,9 @@ public class Board {
         if (isAt(x    , y - 1, element)) count ++;
         if (isAt(x    , y + 1, element)) count ++;
         return count;
+    }
+
+    def getAllHints() {
+        findAll(BOMBS_1,BOMBS_2,BOMBS_3,BOMBS_4,BOMBS_5,BOMBS_6,BOMBS_7,BOMBS_8).collect {new Hint(Character.getNumericValue(getAt(it.x, it.y).char), it)}
     }
 }

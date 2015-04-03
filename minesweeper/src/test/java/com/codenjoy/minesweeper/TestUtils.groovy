@@ -1,4 +1,6 @@
-package com.codenjoy.bomberman
+package com.codenjoy.minesweeper
+
+import com.codenjoy.minesweeper.Element
 
 /**
  * Created by szelenin on 3/25/14.

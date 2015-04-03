@@ -1,4 +1,4 @@
-package com.codenjoy.bomberman;
+package com.codenjoy.minesweeper;
 
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jetty.websocket.WebSocket;

@@ -1,9 +1,11 @@
-package com.codenjoy.bomberman.utils;
+package com.codenjoy.minesweeper;
 
-import com.codenjoy.bomberman.Element;
+import com.codenjoy.minesweeper.Board;
+import com.codenjoy.minesweeper.Element;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -21,8 +23,8 @@ public class BoardTest {
                     /*012345678*/
               /*0*/  "☼☼☼☼☼☼☼☼☼" +
               /*1*/  "☼1234567☼" +
-              /*2*/  "☼8123456☼" +
-              /*3*/  "☼78*****☼" +
+              /*2*/  "☼81     ☼" +
+              /*3*/  "☼ 4*****☼" +
               /*4*/  "☼☺  ‼   ☼" +
               /*5*/  "☼** ‼ 5☻☼" +
               /*6*/  "☼****☻**☼" +
@@ -42,12 +44,12 @@ public class BoardTest {
         assertEquals(Element.DESTROYED_BOMB, board.getAt(2, 7));
     }
 
-/*
     @Test
-    public void shouldWork_getOtherBombermans() {
-        assertEquals("[[4,5], [7,1], [7,3], [3,1], [5,3]]", board.getOtherBombermans().toString());
+    public void shouldWork_getAllHints() {
+        assert '[1,[1,1], 2,[2,1], 3,[3,1], 4,[4,1], 5,[5,1], 6,[6,1], 7,[7,1], 8,[1,2], 1,[2,2], 4,[2,3], 5,[6,5]]' == board.allHints.toString()
     }
 
+/*
     @Test
     public void shouldWork_getBarriers() {
         assertEquals("[[5,2], [1,7], [3,7], [0,0], [1,0], [2,0], [3,0], [4,0], [5,0], [6,0], [7,0], [8,0], [0,1], " +

@@ -1,4 +1,4 @@
-package com.codenjoy.bomberman;
+package com.codenjoy.minesweeper;
 
 /**
  * User: oleksandr.baglai
