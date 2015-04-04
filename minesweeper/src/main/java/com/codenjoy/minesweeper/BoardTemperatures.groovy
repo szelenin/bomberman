@@ -17,15 +17,21 @@ class BoardTemperatures {
         initTemperatures()
     }
 
-    def fillStaticElements = { element, int x, int y ->
-        if (element == Element.WALL) {
-            temperatures[x][y] = WALL_TEMPERATURE
-        }
-        if (element == Element.HIDDEN) {
-            temperatures[x][y] = WALL_TEMPERATURE - HIDDEN_TEMP
-        }
-        if (isSpace(element)) {
-            temperatures[x][y] = WALL_TEMPERATURE - SPACE_TEMP
+    def fillStaticElementsForZeroTemps = { skipElement ->
+        { element, int x, int y ->
+            if (temperatures[x][y] != 0) {
+                return
+            }
+
+            if (element == Element.WALL && skipElement != Element.WALL) {
+                temperatures[x][y] = WALL_TEMPERATURE
+            }
+            if (element == Element.HIDDEN && skipElement != Element.HIDDEN) {
+                temperatures[x][y] = WALL_TEMPERATURE - HIDDEN_TEMP
+            }
+            if (isSpace(element) && skipElement != Element.SPACE) {
+                temperatures[x][y] = WALL_TEMPERATURE - SPACE_TEMP
+            }
         }
     }
 
@@ -41,18 +47,21 @@ class BoardTemperatures {
         if (!isHint(element)) {
             return
         }
-        int hiddenCells = traverseNearby(x, y) {int itX, int itY -> board.getAt(itX, itY) == Element.HIDDEN ? 1 : 0}
+        int hiddenCells = traverseNearby(x, y) { int itX, int itY -> board.getAt(itX, itY) == Element.HIDDEN ? 1 : 0 }
         def hintNo = Character.getNumericValue(element.char)
-        traverseNearby(x, y) {int itX, int itY->
-            temperatures[itX][itY] = (hintNo as double) / hiddenCells
+        traverseNearby(x, y) { int itX, int itY ->
+            temperatures[itX][itY] += (hintNo as double) / hiddenCells
         }
     }
 
 
     def initTemperatures() {
         temperatures = new double[board.boardSize()][board.boardSize()]
-        traverseBoard(fillStaticElements)
+        def aCall = fillStaticElementsForZeroTemps Element.HIDDEN
+        traverseBoard(aCall)
         traverseBoard(fillHints)
+        def secondTraverse = fillStaticElementsForZeroTemps null
+        traverseBoard(secondTraverse)
     }
 
     def traverseBoard(Closure closure) {
