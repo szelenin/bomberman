@@ -99,17 +99,6 @@ public class Board {
         return getBarriers().contains(Point.pt(x, y));
     }
 
-    public int countNear(int x, int y, Element element) {
-        if (Point.pt(x, y).isBad(size)) {
-            return 0;
-        }
-        int count = 0;
-        if (isAt(x - 1, y    , element)) count ++;
-        if (isAt(x + 1, y    , element)) count ++;
-        if (isAt(x    , y - 1, element)) count ++;
-        if (isAt(x    , y + 1, element)) count ++;
-        return count;
-    }
 
     def getAllHints() {
         findAll(BOMBS_1,BOMBS_2,BOMBS_3,BOMBS_4,BOMBS_5,BOMBS_6,BOMBS_7,BOMBS_8).collect {new Hint(Character.getNumericValue(getAt(it.x, it.y).char), it)}

@@ -9,12 +9,12 @@ import spock.lang.Unroll
 class BoardTemperaturesTest extends Specification {
 
     @Unroll
-    def "tempearture when #coordinates"(String board, def coordinates, expectedTemperature) {
+    def "tempearture when #coordinates"(String board, def coordinates, double expectedTemperature) {
         def temperatures = new BoardTemperatures(new Board(board))
 
         expect:
         coordinates.each {
-            assert temperatures.temperatureAt(it[0], it[1]) as double == expectedTemperature
+            assert temperatures.temperatureAt(it[0], it[1]).round(5) == expectedTemperature.round(5)
         }
 
         where:
@@ -66,5 +66,11 @@ class BoardTemperaturesTest extends Specification {
                 "☼*1*☼" +
                 "☼***☼" +
                 "☼☼☼☼☼" || [[1, 1],[2,1],[3,1],[1,2],[3,2],[1,3],[2,3],[3,3]] || 1/8
+        "" +
+                "☼☼☼☼☼" +
+                "☼ **☼" +
+                "☼*1*☼" +
+                "☼***☼" +
+                "☼☼☼☼☼" || [[2,1],[3,1],[1,2],[3,2],[1,3],[2,3],[3,3]] || 1/7
     }
 }

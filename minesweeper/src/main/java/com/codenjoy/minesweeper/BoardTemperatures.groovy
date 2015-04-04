@@ -41,13 +41,9 @@ class BoardTemperatures {
         if (!isHint(element)) {
             return
         }
-        for (int dx = -1; dx < 2; dx++) {
-            for (int dy = -1; dy < 2; dy++) {
-                if (dx == dy && dy == 0) {
-                    continue;
-                }
-                temperatures[x + dx][y + dy] = 1d / 8
-            }
+        int hiddenCells = traverseNearby(x, y) {int itX, int itY -> board.getAt(itX, itY) == Element.HIDDEN ? 1 : 0}
+        traverseNearby(x, y) {int itX, int itY->
+            temperatures[itX][itY] = 1d / hiddenCells
         }
     }
 
@@ -64,6 +60,19 @@ class BoardTemperatures {
                 closure.call(board.getAt(x, y), x, y)
             }
         }
+    }
+
+    def traverseNearby(x, y, Closure closure) {
+        int sum = 0;
+        for (int dx = -1; dx < 2; dx++) {
+            for (int dy = -1; dy < 2; dy++) {
+                if (dx == dy && dy == 0) {
+                    continue;
+                }
+                sum += closure.call(x + dx, y + dy)
+            }
+        }
+        sum
     }
 
     double temperatureAt(int x, int y) {
