@@ -25,18 +25,6 @@ public class Board {
         xyl = new LengthToXY(size);
     }
 
-    public Point getBomberman() {
-        List<Point> result = new LinkedList<Point>();
-        result.addAll(findAll(Element.MINESWEEPER));
-        result.addAll(findAll(Element.BOMB));
-        result.addAll(findAll(Element.DEAD_MINESWEEPER));
-        return result.get(0);
-    }
-
-    public boolean isMyBombermanDead() {
-        return board.indexOf(DEAD_MINESWEEPER.getChar()) != -1;
-    }
-
     public boolean isAt(int x, int y, Element element) {
         if (Point.pt(x, y).isBad(size)) {
             return false;
