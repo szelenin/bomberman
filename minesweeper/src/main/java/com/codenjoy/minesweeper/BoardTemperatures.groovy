@@ -42,8 +42,9 @@ class BoardTemperatures {
             return
         }
         int hiddenCells = traverseNearby(x, y) {int itX, int itY -> board.getAt(itX, itY) == Element.HIDDEN ? 1 : 0}
+        def hintNo = Character.getNumericValue(element.char)
         traverseNearby(x, y) {int itX, int itY->
-            temperatures[itX][itY] = 1d / hiddenCells
+            temperatures[itX][itY] = (hintNo as double) / hiddenCells
         }
     }
 
