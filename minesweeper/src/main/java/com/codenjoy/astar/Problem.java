@@ -34,8 +34,10 @@ public class Problem {
         List<Action> legalActions = state.getLegalActions();
         for (Action action : legalActions) {
             GameState successorState = state.generateSuccessorState(action);
+            Point minesweeper = successorState.getMinesweeper();
             successors.add(new Successor(successorState, action,
-                    (int) (1 + 100 * temperatures.temperatureAt(successorState.getMinesweeper().getX(), successorState.getMinesweeper().getY()))));
+                    (int) (1 + 100 * temperatures.temperatureAt(minesweeper.getX(),
+                            minesweeper.getY()))));
 
         }
         return successors;

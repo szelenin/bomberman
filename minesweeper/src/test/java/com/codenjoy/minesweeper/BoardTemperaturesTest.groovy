@@ -32,6 +32,10 @@ class BoardTemperaturesTest extends Specification {
                 "☼☼☼"   || [[1, 1]]                                                         || 0
         "" +
                 "☼☼☼" +
+                "☼1☼" +
+                "☼☼☼"   || [[0, 0]]                                                         || WALL_TEMPERATURE
+        "" +
+                "☼☼☼" +
                 "☼2☼" +
                 "☼☼☼"   || [[1, 1]]                                                         || 0
         "" +
@@ -92,6 +96,11 @@ class BoardTemperaturesTest extends Specification {
                 "☼1*1☼" +
                 "☼***☼" +
                 "☼☼☼☼☼" || [[1, 1], [3, 1], [3, 1], [3, 3]]                                 || 1 / 5
+        "" +
+                "☼☼☼☼" +
+                "☼ *☼" +
+                "☼1*☼" +
+                "☼☼☼☼" || [[1, 1]]                                                 || 0
     }
 
 }

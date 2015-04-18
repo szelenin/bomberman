@@ -1,6 +1,7 @@
 package com.codenjoy.astar;
 
 import com.codenjoy.minesweeper.Action;
+import org.javatuples.Pair;
 
 import java.util.*;
 
@@ -20,7 +21,7 @@ public class AStarSearch {
         return heuristic.calculate(state) + costs.get(state);
     }
 
-    public List<Action> search(Problem problem) {
+    public Pair<List<Action>, Integer> search(Problem problem) {
         PriorityQueue<Node> fringe = new PriorityQueue<Node>(11,
                 (Node node1, Node node2) -> priorityFunction(node1.state) - priorityFunction(node2.state));
 
@@ -33,11 +34,12 @@ public class AStarSearch {
 
         while (true) {
             if (fringe.isEmpty()) {
-                return Arrays.asList(Action.ACT);
+                return new Pair<>(Arrays.asList(Action.ACT), 0);
             }
             Node node = fringe.poll();
             if (problem.isGoalState(node.state)) {
-                return constructPath(node);
+                List<Action> path = constructPath(node);
+                return new Pair<>(path, costs.get(node.state));
             }
             if (!closed.contains(node.state)) {
                 closed.add(node.state);

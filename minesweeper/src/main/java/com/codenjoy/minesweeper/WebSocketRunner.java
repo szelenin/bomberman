@@ -79,10 +79,8 @@ public class WebSocketRunner {
                     FileUtils.write(new File(String.format("out-%s.txt", currentDay)), boardString+"\n", true);
                     Board board = new Board(boardString);
                     BoardTemperatures temperatures = new BoardTemperatures(board);
-//                    if (state.isDead()) {
-//                        System.out.println("DEAD!!!");
-//                    }
-                    connection.sendMessage("RIGHT");
+                    Agent agent = new Agent();
+                    connection.sendMessage(agent.getAction(temperatures, board).toString());
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (Exception e) {

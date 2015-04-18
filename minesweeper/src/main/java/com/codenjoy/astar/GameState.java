@@ -45,4 +45,22 @@ public class GameState {
 
         return new GameState(new Point(newX, newY), temperatures);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        GameState gameState = (GameState) o;
+
+        if (minesweeper != null ? !minesweeper.equals(gameState.minesweeper) : gameState.minesweeper != null)
+            return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return minesweeper != null ? minesweeper.hashCode() : 0;
+    }
 }

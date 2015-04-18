@@ -50,7 +50,9 @@ class BoardTemperatures {
         int hiddenCells = traverseNearby(x, y) { int itX, int itY -> board.getAt(itX, itY) == Element.HIDDEN ? 1 : 0 }
         def hintNo = Character.getNumericValue(element.char)
         traverseNearby(x, y) { int itX, int itY ->
-            temperatures[itX][itY] += (hintNo as double) / hiddenCells
+            if (board.isAt(itX, itY, Element.HIDDEN)) {
+                temperatures[itX][itY] += (hintNo as double) / hiddenCells
+            }
         }
     }
 
@@ -79,7 +81,11 @@ class BoardTemperatures {
                 if (dx == dy && dy == 0) {
                     continue;
                 }
-                sum += closure.call(x + dx, y + dy)
+
+                def result = closure.call(x + dx, y + dy)
+                if (result) {
+                    sum += result
+                }
             }
         }
         sum
@@ -93,5 +99,9 @@ class BoardTemperatures {
         traverseBoard { ignore, int x, int y ->
             closure.call(x, y, temperatures[x][y])
         }
+    }
+
+    double[][] getTemperatures() {
+        return temperatures
     }
 }
