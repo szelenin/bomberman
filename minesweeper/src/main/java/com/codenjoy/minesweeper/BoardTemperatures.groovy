@@ -5,7 +5,7 @@ package com.codenjoy.minesweeper
  */
 class BoardTemperatures {
     public static final int WALL_TEMPERATURE = 100
-    public static final double HIDDEN_TEMP = 0.5
+    public static final double HIDDEN_TEMP = 0.15
     public static final int SPACE_TEMP = 0
     public static
     final ArrayList<Element> HINTS = [Element.BOMBS_1, Element.BOMBS_2, Element.BOMBS_3, Element.BOMBS_4, Element.BOMBS_5, Element.BOMBS_6, Element.BOMBS_7, Element.BOMBS_8]
