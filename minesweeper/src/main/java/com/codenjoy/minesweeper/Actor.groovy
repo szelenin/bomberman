@@ -1,6 +1,6 @@
 package com.codenjoy.minesweeper
 
-import com.codenjoy.astar.AstarSearch
+import com.codenjoy.astar.AStarSearch
 import com.codenjoy.astar.GameState
 import com.codenjoy.astar.Heuristic
 
@@ -26,7 +26,7 @@ class Actor {
     }
 
     def findPathTo(CellTemperature temperature) {
-        new AstarSearch(new Heuristic() {
+        new AStarSearch(new Heuristic() {
             @Override
             int calculate(GameState state) {
                 return distTo(temperature.coordinates)
