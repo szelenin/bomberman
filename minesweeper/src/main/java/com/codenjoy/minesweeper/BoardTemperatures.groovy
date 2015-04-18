@@ -88,4 +88,10 @@ class BoardTemperatures {
     double temperatureAt(int x, int y) {
         temperatures[x][y]
     }
+
+    void traverseTemperatures(Closure closure) {
+        traverseBoard { ignore, int x, int y ->
+            closure.call(x, y, temperatures[x][y])
+        }
+    }
 }

@@ -103,4 +103,9 @@ public class Board {
     def getAllHints() {
         findAll(BOMBS_1,BOMBS_2,BOMBS_3,BOMBS_4,BOMBS_5,BOMBS_6,BOMBS_7,BOMBS_8).collect {new Hint(Character.getNumericValue(getAt(it.x, it.y).char), it)}
     }
+
+    Point getMinesweeper() {
+        findAll(MINESWEEPER)[0]
+    }
+
 }

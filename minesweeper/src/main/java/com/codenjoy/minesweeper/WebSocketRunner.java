@@ -77,7 +77,8 @@ public class WebSocketRunner {
                 String boardString = matcher.group(1);
                 try {
                     FileUtils.write(new File(String.format("out-%s.txt", currentDay)), boardString+"\n", true);
-
+                    Board board = new Board(boardString);
+                    BoardTemperatures temperatures = new BoardTemperatures(board);
 //                    if (state.isDead()) {
 //                        System.out.println("DEAD!!!");
 //                    }

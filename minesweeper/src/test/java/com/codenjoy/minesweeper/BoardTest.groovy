@@ -49,6 +49,11 @@ public class BoardTest {
         assert '[1,[1,1], 2,[2,1], 3,[3,1], 4,[4,1], 5,[5,1], 6,[6,1], 7,[7,1], 8,[1,2], 1,[2,2], 4,[2,3], 5,[6,5]]' == board.allHints.toString()
     }
 
+    @Test
+    public void shouldGetMinesweeper() {
+        assert board.getMinesweeper() == new Point(1, 4)
+    }
+
 /*
     @Test
     public void shouldWork_getBarriers() {
