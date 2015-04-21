@@ -108,4 +108,15 @@ public class Board {
         findAll(MINESWEEPER)[0]
     }
 
+    def getSpaces() {
+        [] + allHints + findAll(SPACE)
+    }
+
+    def getFlags() {
+        [] + findAll(FLAG)
+    }
+
+    def getHidden() {
+        [] + findAll(HIDDEN)
+    }
 }

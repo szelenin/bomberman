@@ -3,7 +3,7 @@ package com.codenjoy.minesweeper
 import com.codenjoy.astar.AStarSearch
 import com.codenjoy.astar.GameState
 import com.codenjoy.astar.Heuristic
-import com.codenjoy.astar.Problem
+import com.codenjoy.astar.FindRouteProblem
 import org.javatuples.Pair
 
 /**
@@ -47,6 +47,6 @@ class Agent {
             private int manhattanDist(GameState state) {
                 Math.abs(state.minesweeper.x - temperature.coordinates.x) + Math.abs(state.minesweeper.y - temperature.coordinates.y)
             }
-        }).search(new Problem(new GameState(board.minesweeper, temperatures.temperatures), temperature.coordinates, temperatures))
+        }).search(new FindRouteProblem(new GameState(board.minesweeper, temperatures.temperatures), temperature.coordinates, temperatures))
     }
 }

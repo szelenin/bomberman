@@ -59,4 +59,5 @@ public class GameStateTest {
         GameState successorState = gameState.generateSuccessorState(Action.DOWN);
         assertEquals(new Point(1,2), successorState.getMinesweeper());
     }
+
 }

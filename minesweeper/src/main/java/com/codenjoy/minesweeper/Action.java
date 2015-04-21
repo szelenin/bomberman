@@ -3,31 +3,27 @@ package com.codenjoy.minesweeper;
 /**
  * User: oleksandr.baglai
  */
-public enum Action {
-    UP(2, 0, -1), DOWN(3, 0, 1), LEFT(0, -1, 0), RIGHT(1, 1, 0),  // direction of Bomberman
-    ACT(4, 0, 0);                                                // stop the Bomberman
+public class Action {
+    public static final Action UP = new Action(2, 0, -1, 1);
+    public static final Action DOWN = new Action(3, 0, 1, 1);
+    public static final Action LEFT = new Action(0, -1, 0, 1);
+    public static final Action RIGHT = new Action(1, 1, 0, 1);
+    public static final Action ACT = new Action(4, 0, 0, 10);
 
     final int value;
     private final int dx;
     private final int dy;
+    public final int cost;
 
-    Action(int value, int dx, int dy) {
+    Action(int value, int dx, int dy, int cost) {
         this.value = value;
         this.dx = dx;
         this.dy = dy;
+        this.cost = cost;
     }
 
     public String toString() {
-        return this.name();
-    }
-
-    public static Action valueOf(int i) {
-        for (Action d : Action.values()) {
-            if (d.value == i) {
-                return d;
-            }
-        }
-        throw new IllegalArgumentException("No such Action for " + i);
+        return this.getClass().getSimpleName();
     }
 
     public int changeX(int x) {
@@ -39,4 +35,7 @@ public enum Action {
         return y + dy;
     }
 
+    public static Action[] values() {
+        return new Action[]{UP,DOWN,LEFT,RIGHT,ACT};
+    }
 }

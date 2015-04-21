@@ -24,10 +24,6 @@ class BoardTemperaturesTest extends Specification {
         '☼☼☼☼'          || [[0, 0], [1, 0], [0, 1], [1, 1]]                                 || WALL_TEMPERATURE
         "" +
                 "☼☼☼" +
-                "☼*☼" +
-                "☼☼☼"   || [[1, 1]]                                                         || 0.5
-        "" +
-                "☼☼☼" +
                 "☼1☼" +
                 "☼☼☼"   || [[1, 1]]                                                         || 0
         "" +
@@ -103,4 +99,13 @@ class BoardTemperaturesTest extends Specification {
                 "☼☼☼☼" || [[1, 1]]                                                 || 0
     }
 
+    def "hidden temperature"() {
+        when:
+        def temperatures = new BoardTemperatures(new Board("" +
+                "☼☼☼" +
+                "☼*☼" +
+                "☼☼☼"), 1)
+        then:
+        temperatures.temperatureAt(1,1) == 1 / 1
+    }
 }

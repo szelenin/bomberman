@@ -3,6 +3,7 @@ package com.codenjoy.astar;
 import com.codenjoy.minesweeper.Action;
 import com.codenjoy.minesweeper.Point;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,9 +13,9 @@ import java.util.List;
 public class GameState {
     private Point minesweeper;
     private double[][] temperatures;
+    private Point flag;
 
     public GameState(Point minesweeper, double[][] temperatures) {
-
         this.minesweeper = minesweeper;
         this.temperatures = temperatures;
     }
@@ -63,4 +64,9 @@ public class GameState {
     public int hashCode() {
         return minesweeper != null ? minesweeper.hashCode() : 0;
     }
+
+    public Point getFlag() {
+        return flag;
+    }
+
 }
