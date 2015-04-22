@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class FindRouteProblem implements Problem {
     private GameState startState;
-    private Point target;
+    protected Point target;
     private BoardTemperatures temperatures;
 
     public FindRouteProblem(GameState startState, Point target, BoardTemperatures temperatures) {
@@ -33,13 +33,17 @@ public class FindRouteProblem implements Problem {
 
     @Override
     public List<Successor> getSuccessors(GameState state) {
-        ArrayList<Successor> successors = new ArrayList<>();
         List<Action> legalActions = state.getLegalActions();
+        return getSuccessors(state, legalActions);
+    }
+
+    protected ArrayList<Successor> getSuccessors(GameState state, List<Action> legalActions) {
+        ArrayList<Successor> successors = new ArrayList<>();
         for (Action action : legalActions) {
             GameState successorState = state.generateSuccessorState(action);
             Point minesweeper = successorState.getMinesweeper();
             successors.add(new Successor(successorState, action,
-                    (int) (1 + 100 * temperatures.temperatureAt(minesweeper.getX(),
+                    (int) (action.cost + 100 * temperatures.temperatureAt(minesweeper.getX(),
                             minesweeper.getY()))));
 
         }

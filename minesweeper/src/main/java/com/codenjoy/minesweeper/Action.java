@@ -11,8 +11,8 @@ public class Action {
     public static final Action ACT = new Action(4, 0, 0, 10);
 
     final int value;
-    private final int dx;
-    private final int dy;
+    protected final int dx;
+    protected final int dy;
     public final int cost;
 
     Action(int value, int dx, int dy, int cost) {
@@ -37,5 +37,9 @@ public class Action {
 
     public static Action[] values() {
         return new Action[]{UP,DOWN,LEFT,RIGHT,ACT};
+    }
+
+    public boolean isComposite() {
+        return false;
     }
 }

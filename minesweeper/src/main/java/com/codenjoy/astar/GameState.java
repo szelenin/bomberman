@@ -43,7 +43,11 @@ public class GameState {
     public GameState generateSuccessorState(Action action) {
         int newX = action.changeX(minesweeper.getX());
         int newY = action.changeY(minesweeper.getY());
-
+        if (action.isComposite()) {
+            GameState gameState = new GameState(minesweeper, temperatures);
+            gameState.flag = new Point(newX, newY);
+            return gameState;
+        }
         return new GameState(new Point(newX, newY), temperatures);
     }
 

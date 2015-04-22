@@ -7,6 +7,11 @@ class CellTemperature {
     Point coordinates
     double temperature
 
+    CellTemperature(Point coordinates, double temperature) {
+        this.coordinates = coordinates
+        this.temperature = temperature
+    }
+
     Point getCoordinates() {
         return coordinates
     }

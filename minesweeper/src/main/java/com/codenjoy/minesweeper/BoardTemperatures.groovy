@@ -14,7 +14,10 @@ class BoardTemperatures {
 
     BoardTemperatures(Board board, int bombsCount = 30) {
         this.board = board
-        this.hiddenTemp = (board.hidden.size() - board.spaces.size()) / (bombsCount - board.flags.size())
+
+        def hiddenSize = board.hidden.size()
+
+        this.hiddenTemp = (bombsCount - board.flags.size()) / (hiddenSize == 0 ? 1 : hiddenSize)
         initTemperatures()
     }
 
@@ -96,10 +99,14 @@ class BoardTemperatures {
         temperatures[x][y]
     }
 
-    void traverseTemperatures(Closure closure) {
+    void traverseTemperatures(Visitor visitor) {
         traverseBoard { ignore, int x, int y ->
-            closure.call(x, y, temperatures[x][y])
+            visitor.apply(x, y, temperatures[x][y])
         }
+    }
+
+    public static interface Visitor {
+        void apply(int x, int y, double temperature)
     }
 
     double[][] getTemperatures() {

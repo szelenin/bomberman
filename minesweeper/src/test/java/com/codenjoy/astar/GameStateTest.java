@@ -1,6 +1,7 @@
 package com.codenjoy.astar;
 
 import com.codenjoy.minesweeper.Action;
+import com.codenjoy.minesweeper.FlagAction;
 import com.codenjoy.minesweeper.Point;
 import org.junit.Test;
 
@@ -58,6 +59,21 @@ public class GameStateTest {
 
         GameState successorState = gameState.generateSuccessorState(Action.DOWN);
         assertEquals(new Point(1,2), successorState.getMinesweeper());
+    }
+
+    @Test
+    public void shouldGenerateCompositeSuccessor() {
+        GameState gameState = new GameState(new Point(1, 1), new double[][]{
+                {100.0, 100.0, 100.0, 100.0},
+                {100.0, 0.0, 0.0, 100.0},
+                {100.0, 0.0, 0.0, 100.0},
+                {100.0, 100.0, 100.0, 100.0}
+        });
+
+        GameState successorState = gameState.generateSuccessorState(new FlagAction(Action.DOWN));
+
+        assertEquals(new Point(1,1), successorState.getMinesweeper());
+        assertEquals(new Point(1,2), successorState.getFlag());
     }
 
 }
