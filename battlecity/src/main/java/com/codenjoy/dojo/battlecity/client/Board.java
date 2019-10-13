@@ -25,13 +25,17 @@ package com.codenjoy.dojo.battlecity.client;
 
 import com.codenjoy.dojo.battlecity.model.Elements;
 import com.codenjoy.dojo.client.AbstractBoard;
+import com.codenjoy.dojo.services.Direction;
 import com.codenjoy.dojo.services.Point;
 import com.codenjoy.dojo.services.algs.DeikstraFindWay;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import static com.codenjoy.dojo.services.Direction.*;
 import static com.codenjoy.dojo.services.PointImpl.pt;
 
 public class Board extends AbstractBoard<Elements> {
@@ -127,5 +131,30 @@ public class Board extends AbstractBoard<Elements> {
                 getMe(),
                 getEnemies(),
                 getBullets());
+    }
+
+    public List<Direction> getLegalActions() {
+        List<Direction> legalActions = new ArrayList<>(values().length);
+        for (Direction direction : Direction.values()) {
+            Point nextPoint = direction.change(getMe());
+            if (isBarrierAt(nextPoint.getX(), nextPoint.getY())) {
+                continue;
+            }
+            legalActions.add(direction);
+        }
+        return legalActions;
+    }
+
+    public Board createSuccessor(Direction direction) {
+        Point me = getMe();
+        Point newPosition = direction.change(me);
+        Board successor = new Board();
+        successor.size = this.size;
+        successor.field = Arrays.stream(field).map(
+                (a)-> Arrays.stream(a.clone()).map(char[]::clone).toArray(char[][]::new)
+        ).toArray(char[][][]::new);
+        successor.set(newPosition.getX(), newPosition.getY(), this.getAt(me.getX(), me.getY()).ch());
+        successor.set(me.getX(), me.getY(), Elements.NONE.ch());
+        return successor;
     }
 }

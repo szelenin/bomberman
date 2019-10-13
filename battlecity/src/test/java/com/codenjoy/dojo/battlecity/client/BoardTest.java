@@ -23,11 +23,17 @@ package com.codenjoy.dojo.battlecity.client;
  */
 
 import com.codenjoy.dojo.battlecity.model.Elements;
+import com.codenjoy.dojo.services.Direction;
+
+import org.hamcrest.core.IsIterableContaining;
 import org.junit.Before;
 import org.junit.Test;
 
 import static com.codenjoy.dojo.services.PointImpl.pt;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 public class BoardTest {
 
@@ -230,4 +236,19 @@ public class BoardTest {
         assertEquals(false, board.isGameOver());
         assertEquals(true, board(" ").isGameOver());
     }
+
+    @Test
+    public void shouldReturnGetLegalActions() {
+        assertThat(board.getLegalActions(), containsInAnyOrder(Direction.UP, Direction.DOWN, Direction.ACT, Direction.STOP));
+    }
+
+    @Test
+    public void shouldCreateSuccessorWhenMoveToOpenPosition() {
+        Board successor = board.createSuccessor(Direction.UP);
+
+        assertEquals(pt(1, 10), successor.getMe());
+        assertEquals(Elements.TANK_UP, successor.getAt(pt(1, 10)));
+        assertEquals(Elements.NONE, successor.getAt(board.getMe()));
+    }
+
 }

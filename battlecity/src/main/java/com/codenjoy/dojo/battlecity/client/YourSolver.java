@@ -35,6 +35,7 @@ public class YourSolver implements Solver<Board> {
 
     private Dice dice;
     private Board board;
+    private boolean acted = false;
 
     public YourSolver(Dice dice) {
         this.dice = dice;
@@ -42,10 +43,7 @@ public class YourSolver implements Solver<Board> {
 
     @Override
     public String get(Board board) {
-        this.board = board;
-        if (board.isGameOver()) return "";
-
-        return Direction.ACT();
+        return Direction.ACT.toString();
     }
 
     public static void main(String[] args) {
