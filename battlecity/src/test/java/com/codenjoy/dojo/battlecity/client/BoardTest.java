@@ -27,13 +27,13 @@ import com.codenjoy.dojo.services.Direction;
 
 import org.hamcrest.core.IsIterableContaining;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static com.codenjoy.dojo.services.PointImpl.pt;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 public class BoardTest {
 
@@ -251,4 +251,72 @@ public class BoardTest {
         assertEquals(Elements.NONE, successor.getAt(board.getMe()));
     }
 
+    @Test
+    public void shouldKeepOriginalBoardWhenCreateSuccessor() {
+        Board successor = board.createSuccessor(Direction.UP);
+
+        assertEquals(
+                /*14*/"☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼\n" +
+                              /*13*/"☼     »   » « ☼\n" +
+                              /*12*/"☼ ╬ ╬?╬ ╬ ╬ ╬?☼\n" +
+                              /*11*/"☼ ╬ ╬ ╬☼╬ ╬ ╬ ☼\n" +
+                              /*10*/"☼ ╬ ╬ ╬ ╬ ╬ ╬ ☼\n" +
+                              /*9*/"☼▲╬ ╬     ╬ ╬ ☼\n" +
+                              /*8*/"☼•    ╬ ╬     ☼\n" +
+                              /*7*/"☼   ╬     ╬   ☼\n" +
+                              /*6*/"☼     ╬ ╬     ☼\n" +
+                              /*5*/"☼ ╬ ╬ ╬╬╬ ╬ ╬ ☼\n" +
+                              /*4*/"☼˅╬ ╬ ╬ ╬ ╬ ╬ ☼\n" +
+                              /*3*/"☼ ╬         ╬ ☼\n" +
+                              /*2*/"☼ ╬?  ╬╬╬   ╬ ☼\n" +
+                              /*1*/"☼     ╬ ╬     ☼\n" +
+                              /*0*/"☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼\n" +
+                              /*012345678901234*/
+                      "\n" +
+                      "My tank at: [1,9]\n" +
+                      "Enemies at: [[1,4], [3,2], [5,12], [6,13], [10,13], [12,13], [13,12]]\n" +
+                      "Bullets at: [[1,8]]\n", board.toString());
+    }
+
+    @Test
+    public void shouldCreateSuccessorKeepTankAtSamePositionWhenMoveOnWall() {
+        Board successor = board.createSuccessor(Direction.RIGHT);
+
+        assertEquals(board.getMe(), successor.getMe());
+    }
+
+    @Test
+    public void shoulCreateSuccessordKeepTankAtSamePositionWhenMoveOut() {
+        Board successor = board.createSuccessor(Direction.LEFT);
+
+        assertEquals(board.getMe(), successor.getMe());
+    }
+
+    @Test
+    public void shouldCreateSuccessorChangeTankDirectionWhenMoveRight() {
+        Board successor = board.createSuccessor(Direction.RIGHT);
+
+        assertEquals(Elements.TANK_RIGHT, successor.getAt(successor.getMe()));
+    }
+
+    @Test
+    public void shouldCreateSuccessorChangeTankDirectionWhenMoveLeft() {
+        Board successor = board.createSuccessor(Direction.LEFT);
+
+        assertEquals(Elements.TANK_LEFT, successor.getAt(successor.getMe()));
+    }
+
+    @Test
+    public void shouldCreateSuccessorChangeTankDirectionWhenMoveDown() {
+        Board successor = board.createSuccessor(Direction.DOWN);
+
+        assertEquals(Elements.TANK_DOWN, successor.getAt(successor.getMe()));
+    }
+
+    @Test
+    public void shouldCreateSuccessorKeepTankDirectionWhenAct() {
+        Board successor = board.createSuccessor(Direction.ACT);
+
+        assertEquals(board.getAt(board.getMe()), successor.getAt(successor.getMe()));
+    }
 }

@@ -146,15 +146,35 @@ public class Board extends AbstractBoard<Elements> {
     }
 
     public Board createSuccessor(Direction direction) {
-        Point me = getMe();
-        Point newPosition = direction.change(me);
+        Point oldPosition = getMe();
+        Point newPosition = direction.change(oldPosition);
         Board successor = new Board();
         successor.size = this.size;
         successor.field = Arrays.stream(field).map(
                 (a)-> Arrays.stream(a.clone()).map(char[]::clone).toArray(char[][]::new)
         ).toArray(char[][][]::new);
-        successor.set(newPosition.getX(), newPosition.getY(), this.getAt(me.getX(), me.getY()).ch());
-        successor.set(me.getX(), me.getY(), Elements.NONE.ch());
+
+        if (successor.isBarrierAt(newPosition.getX(), newPosition.getY())) {
+            newPosition = oldPosition;
+        }
+        successor.set(oldPosition.getX(), oldPosition.getY(), Elements.NONE.ch());
+        Elements oldTank = this.getAt(oldPosition.getX(), oldPosition.getY());
+        Elements newTank = getNewTankFromDirection(direction, oldTank);
+        successor.set(newPosition.getX(), newPosition.getY(), newTank.ch());
         return successor;
+    }
+
+    private Elements getNewTankFromDirection(Direction direction, Elements oldTank) {
+        switch (direction) {
+            case RIGHT:
+                return Elements.TANK_RIGHT;
+            case LEFT:
+                return Elements.TANK_LEFT;
+            case UP:
+                return Elements.TANK_UP;
+            case DOWN:
+                return Elements.TANK_DOWN;
+        }
+        return oldTank;
     }
 }
