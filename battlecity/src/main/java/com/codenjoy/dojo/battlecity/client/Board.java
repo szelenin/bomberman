@@ -147,13 +147,31 @@ public class Board extends AbstractBoard<Elements> {
     public Board createSuccessor(Direction direction, Board previousState) {
         Point oldPosition = getMe();
         Point newPosition = direction.change(oldPosition);
-        Board successor = new Board();
-        successor.size = this.size;
-        successor.field = Arrays.stream(field).map(
-                (a)-> Arrays.stream(a.clone()).map(char[]::clone).toArray(char[][]::new)
-        ).toArray(char[][][]::new);
-        moveBullets(successor);
+        Board successor = getCopy();
 
+        moveBullets(successor);
+        newPosition = moveTank(direction, oldPosition, newPosition, successor);
+
+        if (direction == ACT) {
+            Direction bulletDirection = getNewDirectionFromTank();
+            moveBullet(successor, newPosition, bulletDirection, 1);
+            successor.bulletDirection = bulletDirection;
+        }
+        return successor;
+    }
+
+    private Direction getNewDirectionFromTank() {
+        Elements me = getAt(getMe());
+        switch (me) {
+            case TANK_UP:
+                return UP;
+            case TANK_DOWN:
+                return DOWN;
+        }
+        return null;
+    }
+
+    private Point moveTank(Direction direction, Point oldPosition, Point newPosition, Board successor) {
         if (successor.isBarrierAt(newPosition.getX(), newPosition.getY())) {
             newPosition = oldPosition;
         }
@@ -161,10 +179,15 @@ public class Board extends AbstractBoard<Elements> {
         Elements oldTank = this.getAt(oldPosition.getX(), oldPosition.getY());
         Elements newTank = getNewTankFromDirection(direction, oldTank);
         successor.set(newPosition.getX(), newPosition.getY(), newTank.ch());
-        if (direction == ACT) {
-            successor.set(newPosition.getX(), newPosition.getY() - 1, Elements.BULLET.ch());
-            successor.bulletDirection = DOWN;
-        }
+        return newPosition;
+    }
+
+    private Board getCopy() {
+        Board successor = new Board();
+        successor.size = this.size;
+        successor.field = Arrays.stream(field).map(
+                (a)-> Arrays.stream(a.clone()).map(char[]::clone).toArray(char[][]::new)
+        ).toArray(char[][][]::new);
         return successor;
     }
 
@@ -172,10 +195,21 @@ public class Board extends AbstractBoard<Elements> {
         if (!getBullets().isEmpty()) {
             Point bullet = getBullets().get(0);
             successor.set(bullet.getX(), bullet.getY(), Elements.NONE.ch());
-            bullet.change(DOWN);
-            bullet.change(DOWN);
-            successor.set(bullet.getX(), bullet.getY(), Elements.BULLET.ch());
+            moveBullet(successor, bullet, DOWN, 2);
         }
+    }
+
+    private void moveBullet(Board successor, Point bullet, Direction direction, int speed) {
+        for (int i = 0; i < speed; i++) {
+            bullet = direction.change(bullet);
+            if (successor.getAt(bullet) == Elements.BATTLE_WALL) {
+                return;
+            }
+            if (isOutOfField(bullet.getX(), bullet.getY())) {
+                return;
+            }
+        }
+        successor.set(bullet.getX(), bullet.getY(), Elements.BULLET.ch());
     }
 
     private Elements getNewTankFromDirection(Direction direction, Elements oldTank) {
