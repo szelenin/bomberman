@@ -153,7 +153,10 @@ public class Board extends AbstractBoard<Elements> {
         Point oldPosition = getMe();
         Point newPosition = direction.change(oldPosition);
         Board successor = getCopy();
-
+        List<Point> bangs = get(Elements.BANG);
+        for (Point bang : bangs) {
+            successor.set(bang.getX(), bang.getY(), Elements.NONE.ch());
+        }
         moveBullets(successor);
         newPosition = moveTank(direction, oldPosition, newPosition, successor);
 

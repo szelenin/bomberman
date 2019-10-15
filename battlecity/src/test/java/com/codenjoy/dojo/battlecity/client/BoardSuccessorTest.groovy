@@ -102,13 +102,29 @@ class BoardSuccessorTest extends Specification {
         '☼   ╬☼|☼   ╬☼|' +
         '☼ ►  ☼|☼•►• ☼|' +
         '☼☼☼☼☼☼|☼☼☼☼☼☼|'       || [ACT]  || 'bullet flying by other tank and me'
-        //todo: ai tank fire
-        //bang disappears
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|' +
+        '☼ ╬ ╬☼|☼ ╬ ╬☼|' +
+        '☼    ☼|☼    ☼|' +
+        '☼   ╬☼|☼   ╬☼|' +
+        '☼►•  ☼|☼►• •☼|' +
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|'       || [ACT]  || 'derived bulled fired by me'
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|' +
+        '☼ ╬ ╬☼|☼•╬ ╬☼|' +
+        '☼    ☼|☼    ☼|' +
+        '☼•  ╬☼|☼   ╬☼|' +
+        '☼?►• ☼|☼?►• ☼|' +
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|'       || [ACT]  || 'bullet flying by AI tank and me'
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|' +
+        '☼ ╬ ╬☼|☼ ╬ ╬☼|' +
+        '☼    ☼|☼    ☼|' +
+        '☼   ╬☼|☼   ╬☼|' +
+        '☼ ►? ☼|☼ ►  ☼|' +
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|'       || [ACT, STOP]  || 'bang disappears'
     }
 
     @Unroll
     def "board successor should return #hitElement when bullet hit"(String initialExpectedBoards, List<Direction> actions, hitElement) {
-        def (currentBoardString, expectedBoardString, Board currentBoard) = calculateBoardString(initialExpectedBoards, actions)
+        def (ignore, ignore2, Board currentBoard) = calculateBoardString(initialExpectedBoards, actions)
         expect:
         currentBoard.getHitElement() == hitElement
 
