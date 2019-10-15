@@ -1,5 +1,6 @@
 package com.codenjoy.dojo.battlecity.client
 
+import com.codenjoy.dojo.battlecity.model.Elements
 import com.codenjoy.dojo.services.Direction
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -8,27 +9,10 @@ import static com.codenjoy.dojo.services.Direction.*
 
 
 class BoardSuccessorTest extends Specification {
+
     @Unroll
     def "board successor should generate #description when actor performed #actions"(String initialExpectedBoards, List<Direction> actions, description) {
-        String initialBoard = ''
-        String expectedBoard = ''
-        initialExpectedBoards.split('\\|').eachWithIndex { String entry, int i ->
-            if (i % 2 == 0) {
-                initialBoard += entry
-            } else {
-                expectedBoard+=entry
-            }
-        }
-        def previousState = null
-        Board currentState = (Board) new Board().forString(initialBoard)
-        for (Direction action : actions) {
-            def nextState = currentState.createSuccessor(action, previousState)
-            previousState = currentState
-            currentState = nextState
-        }
-
-        def currentBoardString = currentState.toString()
-        def expectedBoardString = new Board().forString(expectedBoard).toString()
+        def (String currentBoardString, String expectedBoardString) = calculateBoardString(initialExpectedBoards, actions)
         expect:
         currentBoardString == expectedBoardString
 
@@ -76,6 +60,69 @@ class BoardSuccessorTest extends Specification {
         '☼   ╬☼|☼   ╬☼|' +
         '☼    ☼|☼    ☼|' +
         '☼☼☼☼☼☼|☼☼☼☼☼☼|'       || [ACT, STOP, STOP]  || 'bullet cannot break solid wall when firing right'
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|' +
+        '☼ ╬ ╬☼|☼ ╬ ╬☼|' +
+        '☼►˄  ☼|☼►Ѡ  ☼|' +
+        '☼   ╬☼|☼   ╬☼|' +
+        '☼    ☼|☼    ☼|' +
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|'       || [ACT]  || 'bullet should kill other tank'
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|' +
+        '☼▼╬ ╬☼|☼▼╬ ╬☼|' +
+        '☼    ☼|☼    ☼|' +
+        '☼   ╬☼|☼   ╬☼|' +
+        '☼˃   ☼|☼Ѡ   ☼|' +
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|'       || [ACT, STOP]  || 'bullet should kill other tank on distance'
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|' +
+        '☼?╬ ╬☼|☼Ѡ╬ ╬☼|' +
+        '☼    ☼|☼    ☼|' +
+        '☼   ╬☼|☼ ► ╬☼|' +
+        '☼ ◄  ☼|☼    ☼|' +
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|'       || [LEFT, UP, ACT, RIGHT]  || 'bullet should kill ai tank'
+    }
+
+    @Unroll
+    def "board successor should return #hitElement when bullet hit"(String initialExpectedBoards, List<Direction> actions, hitElement) {
+        def (currentBoardString, expectedBoardString, Board currentBoard) = calculateBoardString(initialExpectedBoards, actions)
+        expect:
+        currentBoard.getHitElement() == hitElement
+
+        where:
+        initialExpectedBoards || actions || hitElement
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|' +
+        '☼ ╬ ╬☼|☼ ╬ ╬☼|' +
+        '☼►˄  ☼|☼►Ѡ  ☼|' +
+        '☼   ╬☼|☼   ╬☼|' +
+        '☼    ☼|☼    ☼|' +
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|'       || [ACT]  || Elements.OTHER_TANK_UP
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|' +
+        '☼ ╬ ╬☼|☼ ╬ ╬☼|' +
+        '☼►«  ☼|☼►Ѡ  ☼|' +
+        '☼   ╬☼|☼   ╬☼|' +
+        '☼    ☼|☼    ☼|' +
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|'       || [ACT]  || Elements.AI_TANK_LEFT
+    }
+
+    private List calculateBoardString(String initialExpectedBoards, List<Direction> actions) {
+        String initialBoard = ''
+        String expectedBoard = ''
+        initialExpectedBoards.split('\\|').eachWithIndex { String entry, int i ->
+            if (i % 2 == 0) {
+                initialBoard += entry
+            } else {
+                expectedBoard += entry
+            }
+        }
+        def previousState = null
+        Board currentState = (Board) new Board().forString(initialBoard)
+        for (Direction action : actions) {
+            def nextState = currentState.createSuccessor(action, previousState)
+            previousState = currentState
+            currentState = nextState
+        }
+
+        def currentBoardString = currentState.toString()
+        def expectedBoardString = new Board().forString(expectedBoard).toString()
+        [currentBoardString, expectedBoardString, currentState]
     }
 
 }

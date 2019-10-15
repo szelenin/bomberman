@@ -359,4 +359,5 @@ public class BoardTest {
 
         assertEquals(Elements.BULLET, successor.getAt(1, 1));
     }
+
 }

@@ -38,6 +38,7 @@ import static com.codenjoy.dojo.services.PointImpl.pt;
 public class Board extends AbstractBoard<Elements> {
 
     private Direction bulletDirection;
+    private Elements hitElement;
 
     @Override
     public Elements valueOf(char ch) {
@@ -214,6 +215,12 @@ public class Board extends AbstractBoard<Elements> {
             if (isOutOfField(bullet.getX(), bullet.getY())) {
                 return;
             }
+            Elements bulletHit = getAt(bullet);
+            if (bulletHit.name().startsWith("OTHER_TANK") || bulletHit.name().startsWith("AI_TANK")) {
+                successor.set(bullet.getX(), bullet.getY(), Elements.BANG.ch());
+                successor.hitElement = bulletHit;
+                return;
+            }
         }
         successor.set(bullet.getX(), bullet.getY(), Elements.BULLET.ch());
         successor.bulletDirection = direction;
@@ -231,5 +238,9 @@ public class Board extends AbstractBoard<Elements> {
                 return Elements.TANK_DOWN;
         }
         return oldTank;
+    }
+
+    public Elements getHitElement() {
+        return hitElement;
     }
 }
