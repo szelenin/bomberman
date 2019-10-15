@@ -58,6 +58,24 @@ class BoardSuccessorTest extends Specification {
         '☼   ╬☼|☼   ╬☼|' +
         '☼    ☼|☼    ☼|' +
         '☼☼☼☼☼☼|☼☼☼☼☼☼|'       || [UP, ACT]  || 'bullet cannot break solid wall when firing up'
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|' +
+        '☼▼╬ ╬☼|☼◄╬ ╬☼|' +
+        '☼    ☼|☼    ☼|' +
+        '☼   ╬☼|☼   ╬☼|' +
+        '☼    ☼|☼    ☼|' +
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|'       || [LEFT, ACT]  || 'bullet cannot break solid wall when firing left'
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|' +
+        '☼ ╬ ╬☼|☼ ╬ ╬☼|' +
+        '☼►   ☼|☼►  •☼|' +
+        '☼   ╬☼|☼   ╬☼|' +
+        '☼    ☼|☼    ☼|' +
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|'       || [ACT, STOP]  || 'bullet 2 cells right from tank'
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|' +
+        '☼ ╬ ╬☼|☼ ╬ ╬☼|' +
+        '☼►   ☼|☼►   ☼|' +
+        '☼   ╬☼|☼   ╬☼|' +
+        '☼    ☼|☼    ☼|' +
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|'       || [ACT, STOP, STOP]  || 'bullet cannot break solid wall when firing right'
     }
 
 }
