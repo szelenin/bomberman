@@ -26,6 +26,7 @@ import com.codenjoy.dojo.services.Direction;
 import com.codenjoy.dojo.client.Solver;
 import com.codenjoy.dojo.services.Dice;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -49,6 +50,7 @@ public class SolverTest {
     }
 
     @Test
+    @Ignore
     public void should() {
         asertAI("☼☼☼☼☼☼☼" +
                 "☼     ☼" +

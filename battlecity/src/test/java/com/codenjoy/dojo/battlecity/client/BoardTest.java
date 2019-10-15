@@ -25,9 +25,7 @@ package com.codenjoy.dojo.battlecity.client;
 import com.codenjoy.dojo.battlecity.model.Elements;
 import com.codenjoy.dojo.services.Direction;
 
-import org.hamcrest.core.IsIterableContaining;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static com.codenjoy.dojo.services.PointImpl.pt;
@@ -243,8 +241,8 @@ public class BoardTest {
     }
 
     @Test
-    public void shouldCreateSuccessorWhenMoveToOpenPosition() {
-        Board successor = board.createSuccessor(Direction.UP);
+    public void createSuccessorShouldWhenMoveToOpenPosition() {
+        Board successor = board.createSuccessor(Direction.UP, null);
 
         assertEquals(pt(1, 10), successor.getMe());
         assertEquals(Elements.TANK_UP, successor.getAt(pt(1, 10)));
@@ -253,7 +251,7 @@ public class BoardTest {
 
     @Test
     public void shouldKeepOriginalBoardWhenCreateSuccessor() {
-        Board successor = board.createSuccessor(Direction.UP);
+        Board successor = board.createSuccessor(Direction.UP, null);
 
         assertEquals(
                 /*14*/"☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼\n" +
@@ -279,44 +277,86 @@ public class BoardTest {
     }
 
     @Test
-    public void shouldCreateSuccessorKeepTankAtSamePositionWhenMoveOnWall() {
-        Board successor = board.createSuccessor(Direction.RIGHT);
+    public void createSuccessorShouldKeepTankAtSamePositionWhenMoveOnWall() {
+        Board successor = board.createSuccessor(Direction.RIGHT, null);
 
         assertEquals(board.getMe(), successor.getMe());
     }
 
     @Test
     public void shoulCreateSuccessordKeepTankAtSamePositionWhenMoveOut() {
-        Board successor = board.createSuccessor(Direction.LEFT);
+        Board successor = board.createSuccessor(Direction.LEFT, null);
 
         assertEquals(board.getMe(), successor.getMe());
     }
 
     @Test
-    public void shouldCreateSuccessorChangeTankDirectionWhenMoveRight() {
-        Board successor = board.createSuccessor(Direction.RIGHT);
+    public void createSuccessorShouldChangeTankDirectionWhenMoveRight() {
+        Board successor = board.createSuccessor(Direction.RIGHT, null);
 
         assertEquals(Elements.TANK_RIGHT, successor.getAt(successor.getMe()));
     }
 
     @Test
-    public void shouldCreateSuccessorChangeTankDirectionWhenMoveLeft() {
-        Board successor = board.createSuccessor(Direction.LEFT);
+    public void createSuccessorShouldChangeTankDirectionWhenMoveLeft() {
+        Board successor = board.createSuccessor(Direction.LEFT, null);
 
         assertEquals(Elements.TANK_LEFT, successor.getAt(successor.getMe()));
     }
 
     @Test
-    public void shouldCreateSuccessorChangeTankDirectionWhenMoveDown() {
-        Board successor = board.createSuccessor(Direction.DOWN);
+    public void createSuccessorShouldChangeTankDirectionWhenMoveDown() {
+        Board successor = board.createSuccessor(Direction.DOWN, null);
 
         assertEquals(Elements.TANK_DOWN, successor.getAt(successor.getMe()));
     }
 
     @Test
-    public void shouldCreateSuccessorKeepTankDirectionWhenAct() {
-        Board successor = board.createSuccessor(Direction.ACT);
+    public void createSuccessorShouldKeepTankDirectionWhenAct() {
+        Board successor = board.createSuccessor(Direction.ACT, null);
 
         assertEquals(board.getAt(board.getMe()), successor.getAt(successor.getMe()));
+    }
+
+    @Test
+    public void createSuccessorShouldMoveBulletDownWhenAct() {
+        Board board = board(
+                "☼☼☼☼☼☼" +
+                "☼▼╬ ╬☼" +
+                "☼    ☼" +
+                "☼   ╬☼" +
+                "☼    ☼" +
+                "☼☼☼☼☼☼");
+        Board successor = board.createSuccessor(Direction.ACT, null);
+
+        assertEquals(Elements.BULLET, successor.getAt(1, 3));
+    }
+
+    @Test
+    public void createSuccessorShouldMoveBulletDownWhenActOnPreviousState() {
+        Board board = board(
+                "☼☼☼☼☼☼" +
+                "☼▼╬ ╬☼" +
+                "☼•   ☼" +
+                "☼   ╬☼" +
+                "☼    ☼" +
+                "☼☼☼☼☼☼");
+        Board successor = board.createSuccessor(Direction.ACT, null);
+
+        assertEquals(Elements.BULLET, successor.getAt(1, 1));
+    }
+
+    @Test
+    public void createSuccessorShouldDamageWallWhenActOnPreviousState() {
+        Board board = board(
+                "☼☼☼☼☼☼" +
+                "☼▼╬ ╬☼" +
+                "☼•   ☼" +
+                "☼╬  ╬☼" +
+                "☼    ☼" +
+                "☼☼☼☼☼☼");
+        Board successor = board.createSuccessor(Direction.ACT, null);
+
+        assertEquals(Elements.BULLET, successor.getAt(1, 1));
     }
 }

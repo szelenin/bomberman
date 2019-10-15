@@ -27,18 +27,17 @@ import com.codenjoy.dojo.battlecity.model.Elements;
 import com.codenjoy.dojo.client.AbstractBoard;
 import com.codenjoy.dojo.services.Direction;
 import com.codenjoy.dojo.services.Point;
-import com.codenjoy.dojo.services.algs.DeikstraFindWay;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 
 import static com.codenjoy.dojo.services.Direction.*;
 import static com.codenjoy.dojo.services.PointImpl.pt;
 
 public class Board extends AbstractBoard<Elements> {
+
+    private Direction bulletDirection;
 
     @Override
     public Elements valueOf(char ch) {
@@ -145,7 +144,7 @@ public class Board extends AbstractBoard<Elements> {
         return legalActions;
     }
 
-    public Board createSuccessor(Direction direction) {
+    public Board createSuccessor(Direction direction, Board previousState) {
         Point oldPosition = getMe();
         Point newPosition = direction.change(oldPosition);
         Board successor = new Board();
@@ -153,6 +152,7 @@ public class Board extends AbstractBoard<Elements> {
         successor.field = Arrays.stream(field).map(
                 (a)-> Arrays.stream(a.clone()).map(char[]::clone).toArray(char[][]::new)
         ).toArray(char[][][]::new);
+        moveBullets(successor);
 
         if (successor.isBarrierAt(newPosition.getX(), newPosition.getY())) {
             newPosition = oldPosition;
@@ -161,7 +161,21 @@ public class Board extends AbstractBoard<Elements> {
         Elements oldTank = this.getAt(oldPosition.getX(), oldPosition.getY());
         Elements newTank = getNewTankFromDirection(direction, oldTank);
         successor.set(newPosition.getX(), newPosition.getY(), newTank.ch());
+        if (direction == ACT) {
+            successor.set(newPosition.getX(), newPosition.getY() - 1, Elements.BULLET.ch());
+            successor.bulletDirection = DOWN;
+        }
         return successor;
+    }
+
+    private void moveBullets(Board successor) {
+        if (!getBullets().isEmpty()) {
+            Point bullet = getBullets().get(0);
+            successor.set(bullet.getX(), bullet.getY(), Elements.NONE.ch());
+            bullet.change(DOWN);
+            bullet.change(DOWN);
+            successor.set(bullet.getX(), bullet.getY(), Elements.BULLET.ch());
+        }
     }
 
     private Elements getNewTankFromDirection(Direction direction, Elements oldTank) {
