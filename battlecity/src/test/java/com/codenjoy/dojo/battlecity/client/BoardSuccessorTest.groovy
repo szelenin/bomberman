@@ -78,6 +78,32 @@ class BoardSuccessorTest extends Specification {
         '☼   ╬☼|☼ ► ╬☼|' +
         '☼ ◄  ☼|☼    ☼|' +
         '☼☼☼☼☼☼|☼☼☼☼☼☼|'       || [LEFT, UP, ACT, RIGHT]  || 'bullet should kill ai tank'
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|' +
+        '☼ ╬ ╬☼|☼ ╬ ╬☼|' +
+        '☼    ☼|☼    ☼|' +
+        '☼˃• ╬☼|☼˃  •☼|' +
+        '☼ ◄  ☼|☼ ◄  ☼|' +
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|'       || [STOP]  || 'bullet fired by other tank'
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|' +
+        '☼˅╬ ╬☼|☼˅╬ ╬☼|' +
+        '☼•   ☼|☼    ☼|' +
+        '☼   ╬☼|☼   ╬☼|' +
+        '☼ ◄  ☼|☼•◄  ☼|' +
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|'       || [ACT]  || 'bullet fired by other tank and me intersects'
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|' +
+        '☼˅╬ ╬☼|☼˅╬ ╬☼|' +
+        '☼•   ☼|☼    ☼|' +
+        '☼   ╬☼|☼   ╬☼|' +
+        '☼  ◄ ☼|☼••◄ ☼|' +
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|'       || [ACT]  || 'bullet fired by other tank and me'
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|' +
+        '☼˅╬ ╬☼|☼˅╬ ╬☼|' +
+        '☼•   ☼|☼    ☼|' +
+        '☼   ╬☼|☼   ╬☼|' +
+        '☼ ►  ☼|☼•►• ☼|' +
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|'       || [ACT]  || 'bullet flying by other tank and me'
+        //todo: ai tank fire
+        //bang disappears
     }
 
     @Unroll
@@ -115,7 +141,7 @@ class BoardSuccessorTest extends Specification {
         def previousState = null
         Board currentState = (Board) new Board().forString(initialBoard)
         for (Direction action : actions) {
-            def nextState = currentState.createSuccessor(action, previousState)
+            def nextState = currentState.createSuccessor(action)
             previousState = currentState
             currentState = nextState
         }

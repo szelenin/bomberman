@@ -242,7 +242,7 @@ public class BoardTest {
 
     @Test
     public void createSuccessorShouldWhenMoveToOpenPosition() {
-        Board successor = board.createSuccessor(Direction.UP, null);
+        Board successor = board.createSuccessor(Direction.UP);
 
         assertEquals(pt(1, 10), successor.getMe());
         assertEquals(Elements.TANK_UP, successor.getAt(pt(1, 10)));
@@ -251,7 +251,7 @@ public class BoardTest {
 
     @Test
     public void shouldKeepOriginalBoardWhenCreateSuccessor() {
-        Board successor = board.createSuccessor(Direction.UP, null);
+        Board successor = board.createSuccessor(Direction.UP);
 
         assertEquals(
                 /*14*/"☼☼☼☼☼☼☼☼☼☼☼☼☼☼☼\n" +
@@ -278,42 +278,42 @@ public class BoardTest {
 
     @Test
     public void createSuccessorShouldKeepTankAtSamePositionWhenMoveOnWall() {
-        Board successor = board.createSuccessor(Direction.RIGHT, null);
+        Board successor = board.createSuccessor(Direction.RIGHT);
 
         assertEquals(board.getMe(), successor.getMe());
     }
 
     @Test
     public void shoulCreateSuccessordKeepTankAtSamePositionWhenMoveOut() {
-        Board successor = board.createSuccessor(Direction.LEFT, null);
+        Board successor = board.createSuccessor(Direction.LEFT);
 
         assertEquals(board.getMe(), successor.getMe());
     }
 
     @Test
     public void createSuccessorShouldChangeTankDirectionWhenMoveRight() {
-        Board successor = board.createSuccessor(Direction.RIGHT, null);
+        Board successor = board.createSuccessor(Direction.RIGHT);
 
         assertEquals(Elements.TANK_RIGHT, successor.getAt(successor.getMe()));
     }
 
     @Test
     public void createSuccessorShouldChangeTankDirectionWhenMoveLeft() {
-        Board successor = board.createSuccessor(Direction.LEFT, null);
+        Board successor = board.createSuccessor(Direction.LEFT);
 
         assertEquals(Elements.TANK_LEFT, successor.getAt(successor.getMe()));
     }
 
     @Test
     public void createSuccessorShouldChangeTankDirectionWhenMoveDown() {
-        Board successor = board.createSuccessor(Direction.DOWN, null);
+        Board successor = board.createSuccessor(Direction.DOWN);
 
         assertEquals(Elements.TANK_DOWN, successor.getAt(successor.getMe()));
     }
 
     @Test
     public void createSuccessorShouldKeepTankDirectionWhenAct() {
-        Board successor = board.createSuccessor(Direction.ACT, null);
+        Board successor = board.createSuccessor(Direction.ACT);
 
         assertEquals(board.getAt(board.getMe()), successor.getAt(successor.getMe()));
     }
@@ -327,7 +327,7 @@ public class BoardTest {
                 "☼   ╬☼" +
                 "☼    ☼" +
                 "☼☼☼☼☼☼");
-        Board successor = board.createSuccessor(Direction.ACT, null);
+        Board successor = board.createSuccessor(Direction.ACT);
 
         assertEquals(Elements.BULLET, successor.getAt(1, 3));
     }
@@ -341,7 +341,7 @@ public class BoardTest {
                 "☼   ╬☼" +
                 "☼    ☼" +
                 "☼☼☼☼☼☼");
-        Board successor = board.createSuccessor(Direction.ACT, null);
+        Board successor = board.createSuccessor(Direction.ACT);
 
         assertEquals(Elements.BULLET, successor.getAt(1, 1));
     }
@@ -355,7 +355,7 @@ public class BoardTest {
                 "☼╬  ╬☼" +
                 "☼    ☼" +
                 "☼☼☼☼☼☼");
-        Board successor = board.createSuccessor(Direction.ACT, null);
+        Board successor = board.createSuccessor(Direction.ACT);
 
         assertEquals(Elements.BULLET, successor.getAt(1, 1));
     }

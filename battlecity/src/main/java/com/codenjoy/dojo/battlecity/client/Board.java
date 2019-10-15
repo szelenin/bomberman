@@ -28,17 +28,21 @@ import com.codenjoy.dojo.client.AbstractBoard;
 import com.codenjoy.dojo.services.Direction;
 import com.codenjoy.dojo.services.Point;
 
+import javax.swing.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.codenjoy.dojo.services.Direction.*;
 import static com.codenjoy.dojo.services.PointImpl.pt;
 
 public class Board extends AbstractBoard<Elements> {
 
-    private Direction bulletDirection;
     private Elements hitElement;
+    private Map<Point, Direction> bulletDirections = new HashMap<>();
 
     @Override
     public Elements valueOf(char ch) {
@@ -145,7 +149,7 @@ public class Board extends AbstractBoard<Elements> {
         return legalActions;
     }
 
-    public Board createSuccessor(Direction direction, Board previousState) {
+    public Board createSuccessor(Direction direction) {
         Point oldPosition = getMe();
         Point newPosition = direction.change(oldPosition);
         Board successor = getCopy();
@@ -155,8 +159,10 @@ public class Board extends AbstractBoard<Elements> {
 
         if (direction == ACT) {
             Direction bulletDirection = getNewDirectionFromTank();
-            moveBullet(successor, newPosition, bulletDirection, 1);
-            successor.bulletDirection = bulletDirection;
+            Point newBulletPosition = moveBullet(successor, newPosition, bulletDirection, 1);
+            if (newBulletPosition != null) {
+                successor.bulletDirections.put(newBulletPosition, bulletDirection);
+            }
         }
         return successor;
     }
@@ -197,33 +203,51 @@ public class Board extends AbstractBoard<Elements> {
     }
 
     private void moveBullets(Board successor) {
-        if (!getBullets().isEmpty()) {
-            Point bullet = getBullets().get(0);
+        for (Point bullet : getBullets()) {
             successor.set(bullet.getX(), bullet.getY(), Elements.NONE.ch());
 
+            Direction bulletDirection = bulletDirections.get(bullet);
+            if (bulletDirection == null) {
+                bulletDirection = deriveBulletDirection(bullet);
+            }
+            //todo:Always down?
             Direction direction = bulletDirection == null? DOWN : bulletDirection;
             moveBullet(successor, bullet, direction, 2);
         }
     }
 
-    private void moveBullet(Board successor, Point bullet, Direction direction, int speed) {
+    private Direction deriveBulletDirection(Point bullet) {
+        List<Direction> allDirections = Arrays.asList(UP, RIGHT, DOWN, LEFT);
+        for (Direction direction : allDirections) {
+            Point checkPoint = direction.change(bullet);
+            Elements element = getAt(checkPoint);
+            if (element.name().contains("TANK") && element.name().contains(direction.inverted().name())) {
+                return direction.inverted();
+            }
+        }
+        return null;
+    }
+
+    private Point moveBullet(Board successor, Point bullet, Direction direction, int speed) {
+        bulletDirections.remove(bullet);
         for (int i = 0; i < speed; i++) {
             bullet = direction.change(bullet);
             if (successor.getAt(bullet) == Elements.BATTLE_WALL) {
-                return;
+                return null;
             }
             if (isOutOfField(bullet.getX(), bullet.getY())) {
-                return;
+                return null;
             }
             Elements bulletHit = getAt(bullet);
             if (bulletHit.name().startsWith("OTHER_TANK") || bulletHit.name().startsWith("AI_TANK")) {
                 successor.set(bullet.getX(), bullet.getY(), Elements.BANG.ch());
                 successor.hitElement = bulletHit;
-                return;
+                return null;
             }
         }
         successor.set(bullet.getX(), bullet.getY(), Elements.BULLET.ch());
-        successor.bulletDirection = direction;
+        successor.bulletDirections.put(bullet, direction);
+        return bullet;
     }
 
     private Elements getNewTankFromDirection(Direction direction, Elements oldTank) {
