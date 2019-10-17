@@ -28,8 +28,6 @@ import com.codenjoy.dojo.client.AbstractBoard;
 import com.codenjoy.dojo.services.Direction;
 import com.codenjoy.dojo.services.Point;
 
-import javax.swing.*;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -42,7 +40,17 @@ import static com.codenjoy.dojo.services.PointImpl.pt;
 public class Board extends AbstractBoard<Elements> {
 
     private Elements hitElement;
-    private Map<Point, Direction> bulletDirections = new HashMap<>();
+    private Map<Point, BulletInfo> bulletDirections = new HashMap<>();
+
+    private class BulletInfo {
+        private final Direction direction;
+        private final boolean isMyBullet;
+
+        private BulletInfo(Direction direction, boolean isMyBullet) {
+            this.direction = direction;
+            this.isMyBullet = isMyBullet;
+        }
+    }
 
     @Override
     public Elements valueOf(char ch) {
@@ -158,13 +166,16 @@ public class Board extends AbstractBoard<Elements> {
             successor.set(bang.getX(), bang.getY(), Elements.NONE.ch());
         }
         moveBullets(successor);
+        if (successor.isGameOver()) {
+            return successor;
+        }
         newPosition = moveTank(direction, oldPosition, newPosition, successor);
 
         if (direction == ACT) {
-            Direction bulletDirection = getNewDirectionFromTank();
-            Point newBulletPosition = moveBullet(successor, newPosition, bulletDirection, 1);
+            BulletInfo bulletInfo = new BulletInfo(getNewDirectionFromTank(), true);
+            Point newBulletPosition = moveBullet(successor, newPosition, bulletInfo, 1);
             if (newBulletPosition != null) {
-                successor.bulletDirections.put(newBulletPosition, bulletDirection);
+                successor.bulletDirections.put(newBulletPosition, bulletInfo);
             }
         }
         return successor;
@@ -209,13 +220,16 @@ public class Board extends AbstractBoard<Elements> {
         for (Point bullet : getBullets()) {
             successor.set(bullet.getX(), bullet.getY(), Elements.NONE.ch());
 
-            Direction bulletDirection = bulletDirections.get(bullet);
-            if (bulletDirection == null) {
-                bulletDirection = deriveBulletDirection(bullet);
+            BulletInfo bulletInfo = bulletDirections.get(bullet);
+            if (bulletInfo == null) {
+                Direction derivedDirection = deriveBulletDirection(bullet);
+                if (derivedDirection != null) {
+                    bulletInfo = new BulletInfo(derivedDirection, false);
+                }
             }
             //todo:Always down?
-            Direction direction = bulletDirection == null? DOWN : bulletDirection;
-            moveBullet(successor, bullet, direction, 2);
+            bulletInfo = bulletInfo == null? new BulletInfo(DOWN, false) : bulletInfo;
+            moveBullet(successor, bullet, bulletInfo, 2);
         }
     }
 
@@ -231,10 +245,10 @@ public class Board extends AbstractBoard<Elements> {
         return null;
     }
 
-    private Point moveBullet(Board successor, Point bullet, Direction direction, int speed) {
+    private Point moveBullet(Board successor, Point bullet, BulletInfo bulletInfo, int speed) {
         bulletDirections.remove(bullet);
         for (int i = 0; i < speed; i++) {
-            bullet = direction.change(bullet);
+            bullet = bulletInfo.direction.change(bullet);
             if (successor.getAt(bullet) == Elements.BATTLE_WALL) {
                 return null;
             }
@@ -242,19 +256,18 @@ public class Board extends AbstractBoard<Elements> {
                 return null;
             }
             Elements bulletHit = getAt(bullet);
-            if (bulletHit.name().startsWith("OTHER_TANK") || bulletHit.name().startsWith("AI_TANK")) {
-                successor.set(bullet.getX(), bullet.getY(), Elements.BANG.ch());
-                successor.hitElement = bulletHit;
-                return null;
+            if (bulletHit == Elements.NONE) {
+                continue;
             }
-            if (bulletHit.name().contains("CONSTRUCTION")) {
-                successor.set(bullet.getX(), bullet.getY(), bulletHit.shoot(direction).ch());
+            successor.set(bullet.getX(), bullet.getY(), bulletHit.shoot(bulletInfo.direction).ch());
+            if (bulletInfo.isMyBullet) {
                 successor.hitElement = bulletHit;
-                return null;
             }
+            return null;
         }
+
         successor.set(bullet.getX(), bullet.getY(), Elements.BULLET.ch());
-        successor.bulletDirections.put(bullet, direction);
+        successor.bulletDirections.put(bullet, bulletInfo);
         return bullet;
     }
 

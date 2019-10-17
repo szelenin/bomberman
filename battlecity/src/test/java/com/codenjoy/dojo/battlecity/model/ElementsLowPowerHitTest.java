@@ -10,8 +10,7 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static com.codenjoy.dojo.battlecity.model.Elements.BANG;
-import static com.codenjoy.dojo.battlecity.model.Elements.NONE;
+import static com.codenjoy.dojo.battlecity.model.Elements.*;
 import static com.codenjoy.dojo.services.Direction.*;
 import static org.junit.Assert.assertEquals;
 
@@ -41,6 +40,14 @@ public class ElementsLowPowerHitTest {
     @Test
     public void shouldReturnNoneWhenLowPowerConstructionHitFromAllDirections() {
         verifyElementsAllBecomeAfterHit((e) -> e.name().startsWith("CONSTRUCTION") && e.power == 1, NONE);
+    }
+
+    @Test
+    public void shouldReturnBulletWhenBulletHitByBullet() {
+        assertEquals(BULLET, BULLET.shoot(UP));
+        assertEquals(BULLET, BULLET.shoot(DOWN));
+        assertEquals(BULLET, BULLET.shoot(RIGHT));
+        assertEquals(BULLET, BULLET.shoot(LEFT));
     }
 
     private void verifyElementsAllBecomeAfterHit(Predicate<Elements> elementsPredicate, Elements expectedAfterShoot) {

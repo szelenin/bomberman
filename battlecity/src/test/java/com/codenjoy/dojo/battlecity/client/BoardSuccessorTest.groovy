@@ -156,6 +156,30 @@ class BoardSuccessorTest extends Specification {
         '☼   ╬☼|☼   ╬☼|' +
         '☼ ╬ ◄☼|☼ ┐ ▼☼|' +
         '☼☼☼☼☼☼|☼☼☼☼☼☼|'       || [ACT, DOWN]  || 'my and other bullet damage wall'
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|' +
+        '☼ ˅  ☼|☼ ˅  ☼|' +
+        '☼ •  ☼|☼    ☼|' +
+        '☼   ╬☼|☼   ╬☼|' +
+        '☼ ╬ ◄☼|☼   ◄☼|' +
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|'       || [ACT, ACT, STOP]  || 'my and other bullet destroyed wall'
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|' +
+        '☼ ˅  ☼|☼ ˅  ☼|' +
+        '☼ •  ☼|☼    ☼|' +
+        '☼   ╬☼|☼   ╬☼|' +
+        '☼ ◄  ☼|☼ Ѡ  ☼|' +
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|'       || [STOP]  || 'my tank is hit by other tank'
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|' +
+        '☼ ˅◄ ☼|☼ Ѡ◄ ☼|' +
+        '☼ •  ☼|☼    ☼|' +
+        '☼   ╬☼|☼   ╬☼|' +
+        '☼ »  ☼|☼ Ѡ  ☼|' +
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|'       || [ACT]  || 'ai tank is hit by other tank and other tank hit by me'
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|' +
+        '☼ ˅  ☼|☼ ˅  ☼|' +
+        '☼ •  ☼|☼    ☼|' +
+        '☼   ╬☼|☼   ╬☼|' +
+        '☼  ◄ ☼|☼ •◄ ☼|' +
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|'       || [ACT]  || 'bullets intersections'
     }
 
     @Unroll
@@ -184,6 +208,12 @@ class BoardSuccessorTest extends Specification {
         '☼►  ╬☼|☼►  ╠☼|' +
         '☼    ☼|☼    ☼|' +
         '☼☼☼☼☼☼|☼☼☼☼☼☼|'       || [ACT, STOP]  || Elements.CONSTRUCTION
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|' +
+        '☼ ╬ ╬☼|☼ ╩ ╬☼|' +
+        '☼ •  ☼|☼    ☼|' +
+        '☼►˄ ╬☼|☼►˄ ╠☼|' +
+        '☼    ☼|☼    ☼|' +
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|'       || [STOP]  || null
     }
 
     private List calculateBoardString(String initialExpectedBoards, List<Direction> actions) {

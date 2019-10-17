@@ -144,6 +144,9 @@ public enum Elements implements CharElements {
     }
 
     public Elements shoot(Direction fromDirection) {
+        if (this == BULLET) {
+            return BULLET;
+        }
         if (hitOptions.length == 1) {
             return hitOptions[0];
         }
