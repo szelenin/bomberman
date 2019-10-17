@@ -12,7 +12,7 @@ class BoardSuccessorTest extends Specification {
 
     @Unroll
     def "board successor should generate #description when actor performed #actions"(String initialExpectedBoards, List<Direction> actions, description) {
-        def (String currentBoardString, String expectedBoardString) = calculateBoardString(initialExpectedBoards, actions)
+        def (String currentBoardString, String expectedBoardString) = calculateBoardString(initialExpectedBoards, actions, 2, 0)
         expect:
         currentBoardString == expectedBoardString
 
@@ -184,7 +184,7 @@ class BoardSuccessorTest extends Specification {
 
     @Unroll
     def "board successor should return #hitElement when bullet hit"(String initialExpectedBoards, List<Direction> actions, hitElement) {
-        def (ignore, ignore2, Board currentBoard) = calculateBoardString(initialExpectedBoards, actions)
+        def (ignore, ignore2, Board currentBoard) = calculateBoardString(initialExpectedBoards, actions, 2, 0)
         expect:
         currentBoard.getHitElement() == hitElement
 
@@ -216,27 +216,66 @@ class BoardSuccessorTest extends Specification {
         '☼☼☼☼☼☼|☼☼☼☼☼☼|'       || [STOP]  || null
     }
 
-    private List calculateBoardString(String initialExpectedBoards, List<Direction> actions) {
-        String initialBoard = ''
-        String expectedBoard = ''
-        initialExpectedBoards.split('\\|').eachWithIndex { String entry, int i ->
-            if (i % 2 == 0) {
-                initialBoard += entry
-            } else {
-                expectedBoard += entry
-            }
-        }
-        def previousState = null
-        Board currentState = (Board) new Board().forString(initialBoard)
+    @Unroll
+    def "board successor should generate derive #description from previous state"(String previoiusCurrentExpectedBoards, List<Direction> actions, description) {
+        def (String currentBoardString, String expectedBoardString) = calculateBoardString(previoiusCurrentExpectedBoards, actions, 3, 1)
+        expect:
+        currentBoardString == expectedBoardString
+
+        where:
+        previoiusCurrentExpectedBoards || actions || description
+        '☼☼☼☼☼☼☼|☼☼☼☼☼☼☼|☼☼☼☼☼☼☼|' +
+        '☼▼•  ╬☼|☼▼   ╬☼|☼▼   ╬☼|' +
+        '☼     ☼|☼     ☼|☼•    ☼|' +
+        '☼    ╬☼|☼ •  ╬☼|☼    ╬☼|' +
+        '☼     ☼|☼     ☼|☼     ☼|' +
+        '☼     ☼|☼     ☼|☼ •   ☼|' +
+        '☼☼☼☼☼☼☼|☼☼☼☼☼☼☼|☼☼☼☼☼☼☼|'       || [ACT]  || 'bullet down direction derived from previous'
+        '☼☼☼☼☼☼☼|☼☼☼☼☼☼☼|☼☼☼☼☼☼☼|' +
+        '☼▼   ╬☼|☼▼   ╬☼|☼Ѡ   ╬☼|' +
+        '☼     ☼|☼     ☼|☼     ☼|' +
+        '☼    ╬☼|☼•   ╬☼|☼    ╬☼|' +
+        '☼     ☼|☼     ☼|☼     ☼|' +
+        '☼•    ☼|☼     ☼|☼     ☼|' +
+        '☼☼☼☼☼☼☼|☼☼☼☼☼☼☼|☼☼☼☼☼☼☼|'       || [STOP]  || 'bullet up direction derived from previous'
+        '☼☼☼☼☼☼☼|☼☼☼☼☼☼☼|☼☼☼☼☼☼☼|' +
+        '☼▼   ╬☼|☼▼   ╬☼|☼▼   ╬☼|' +
+        '☼     ☼|☼     ☼|☼•    ☼|' +
+        '☼•   ╬☼|☼  • ╬☼|☼    ╠☼|' +
+        '☼     ☼|☼     ☼|☼     ☼|' +
+        '☼     ☼|☼     ☼|☼     ☼|' +
+        '☼☼☼☼☼☼☼|☼☼☼☼☼☼☼|☼☼☼☼☼☼☼|'       || [ACT]  || 'bullet right direction derived from previous'
+        '☼☼☼☼☼☼☼|☼☼☼☼☼☼☼|☼☼☼☼☼☼☼|' +
+        '☼    ╬☼|☼    ╬☼|☼    ╬☼|' +
+        '☼     ☼|☼     ☼|☼     ☼|' +
+        '☼▼  • ☼|☼▼•   ☼|☼Ѡ    ☼|' +
+        '☼     ☼|☼     ☼|☼     ☼|' +
+        '☼     ☼|☼     ☼|☼     ☼|' +
+        '☼☼☼☼☼☼☼|☼☼☼☼☼☼☼|☼☼☼☼☼☼☼|'       || [ACT]  || 'bullet left direction derived from previous'
+    }
+
+    private List calculateBoardString(String initialExpectedBoards, List<Direction> actions, Integer boardsAmount, Integer currentBoardIndex) {
+        def boards = splitBoardString(boardsAmount, initialExpectedBoards)
+        def previousState = boardsAmount == 3? new Board().forString(boards[0]): null
+        Board currentState = (Board) new Board().forString(boards[currentBoardIndex])
         for (Direction action : actions) {
-            def nextState = currentState.createSuccessor(action)
+            def nextState = currentState.createSuccessor(action, previousState)
             previousState = currentState
             currentState = nextState
         }
 
         def currentBoardString = currentState.toString()
-        def expectedBoardString = new Board().forString(expectedBoard).toString()
+        def expectedBoardString = new Board().forString(boards.last()).toString()
         [currentBoardString, expectedBoardString, currentState]
+    }
+
+    private def splitBoardString(int boardsAmount, String boardStrings) {
+        def result = []
+        boardsAmount.downto 1, { result << '' }
+        boardStrings.split('\\|').eachWithIndex { String entry, int i ->
+            result[i % boardsAmount] += entry
+        }
+        result
     }
 
 }

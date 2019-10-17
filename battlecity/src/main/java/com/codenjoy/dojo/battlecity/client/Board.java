@@ -157,7 +157,7 @@ public class Board extends AbstractBoard<Elements> {
         return legalActions;
     }
 
-    public Board createSuccessor(Direction direction) {
+    public Board createSuccessor(Direction direction, Board previousState) {
         Point oldPosition = getMe();
         Point newPosition = direction.change(oldPosition);
         Board successor = getCopy();
@@ -165,7 +165,7 @@ public class Board extends AbstractBoard<Elements> {
         for (Point bang : bangs) {
             successor.set(bang.getX(), bang.getY(), Elements.NONE.ch());
         }
-        moveBullets(successor);
+        moveBullets(successor, previousState);
         if (successor.isGameOver()) {
             return successor;
         }
@@ -216,13 +216,13 @@ public class Board extends AbstractBoard<Elements> {
         return successor;
     }
 
-    private void moveBullets(Board successor) {
+    private void moveBullets(Board successor, Board previousState) {
         for (Point bullet : getBullets()) {
             successor.set(bullet.getX(), bullet.getY(), Elements.NONE.ch());
 
             BulletInfo bulletInfo = bulletDirections.get(bullet);
             if (bulletInfo == null) {
-                Direction derivedDirection = deriveBulletDirection(bullet);
+                Direction derivedDirection = deriveBulletDirection(bullet, previousState);
                 if (derivedDirection != null) {
                     bulletInfo = new BulletInfo(derivedDirection, false);
                 }
@@ -233,7 +233,7 @@ public class Board extends AbstractBoard<Elements> {
         }
     }
 
-    private Direction deriveBulletDirection(Point bullet) {
+    private Direction deriveBulletDirection(Point bullet, Board previousState) {
         List<Direction> allDirections = Arrays.asList(UP, RIGHT, DOWN, LEFT);
         for (Direction direction : allDirections) {
             Point checkPoint = direction.change(bullet);
@@ -242,6 +242,18 @@ public class Board extends AbstractBoard<Elements> {
                 return direction.inverted();
             }
         }
+        if (previousState == null) {
+            return null;
+        }
+        for (Direction direction : allDirections) {
+            Point checkPoint = direction.change(bullet);
+            checkPoint = direction.change(checkPoint);
+            Elements element = previousState.getAt(checkPoint);
+            if (element == Elements.BULLET) {
+                return direction.inverted();
+            }
+        }
+
         return null;
     }
 
