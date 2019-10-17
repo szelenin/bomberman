@@ -125,7 +125,37 @@ class BoardSuccessorTest extends Specification {
         '☼    ☼|☼    ☼|' +
         '☼   ╬☼|☼   ╬☼|' +
         '☼    ☼|☼    ☼|' +
-        '☼☼☼☼☼☼|☼☼☼☼☼☼|'       || [ACT]  || 'my bullet damage wall'
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|'       || [ACT]  || 'my bullet damage wall from left'
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|' +
+        '☼ ╬ ◄☼|☼ ╣ ►☼|' +
+        '☼    ☼|☼    ☼|' +
+        '☼   ╬☼|☼   ╬☼|' +
+        '☼    ☼|☼    ☼|' +
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|'       || [ACT, RIGHT]  || 'my bullet damage wall from right'
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|' +
+        '☼ ╬  ☼|☼ ╩  ☼|' +
+        '☼    ☼|☼    ☼|' +
+        '☼   ╬☼|☼ ▲ ╬☼|' +
+        '☼ ▲  ☼|☼    ☼|' +
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|'       || [ACT, UP]  || 'my bullet damage wall from down'
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|' +
+        '☼ ╬ ▼☼|☼ ╣◄ ☼|' +
+        '☼    ☼|☼    ☼|' +
+        '☼   ╬☼|☼   ╦☼|' +
+        '☼    ☼|☼    ☼|' +
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|'       || [ACT, LEFT, ACT]  || 'my bullet damage 2 walls from up and right'
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|' +
+        '☼ ˅  ☼|☼ ˅  ☼|' +
+        '☼ •  ☼|☼    ☼|' +
+        '☼   ╬☼|☼   ╬☼|' +
+        '☼ ╬ ◄☼|☼ ╦ ◄☼|' +
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|'       || [STOP, STOP]  || 'other bullet damages wall'
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|' +
+        '☼ ˅  ☼|☼ ˅  ☼|' +
+        '☼ •  ☼|☼    ☼|' +
+        '☼   ╬☼|☼   ╬☼|' +
+        '☼ ╬ ◄☼|☼ ┐ ▼☼|' +
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|'       || [ACT, DOWN]  || 'my and other bullet damage wall'
     }
 
     @Unroll
