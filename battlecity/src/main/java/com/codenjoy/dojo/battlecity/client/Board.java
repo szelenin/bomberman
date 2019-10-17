@@ -247,6 +247,11 @@ public class Board extends AbstractBoard<Elements> {
                 successor.hitElement = bulletHit;
                 return null;
             }
+            if (bulletHit.name().contains("CONSTRUCTION")) {
+                successor.set(bullet.getX(), bullet.getY(), bulletHit.shoot(direction));
+                successor.hitElement = bulletHit;
+                return null;
+            }
         }
         successor.set(bullet.getX(), bullet.getY(), Elements.BULLET.ch());
         successor.bulletDirections.put(bullet, direction);

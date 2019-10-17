@@ -23,7 +23,13 @@ package com.codenjoy.dojo.battlecity.model;
  */
 
 
+import com.codenjoy.dojo.services.Direction;
 import com.codenjoy.dojo.services.printer.CharElements;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.MultimapBuilder;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -37,12 +43,13 @@ public enum Elements implements CharElements {
     BATTLE_WALL('☼'),
     BANG('Ѡ'),
 
-    CONSTRUCTION('╬', 3),
 
     CONSTRUCTION_DESTROYED_DOWN('╩', 2),
     CONSTRUCTION_DESTROYED_UP('╦', 2),
     CONSTRUCTION_DESTROYED_LEFT('╠', 2),
     CONSTRUCTION_DESTROYED_RIGHT('╣', 2),
+
+    CONSTRUCTION('╬', 3, CONSTRUCTION_DESTROYED_DOWN, CONSTRUCTION_DESTROYED_UP, CONSTRUCTION_DESTROYED_LEFT, CONSTRUCTION_DESTROYED_RIGHT),
 
     CONSTRUCTION_DESTROYED_DOWN_TWICE('╨', 1),
     CONSTRUCTION_DESTROYED_UP_TWICE('╥', 1),
@@ -74,12 +81,15 @@ public enum Elements implements CharElements {
     AI_TANK_UP('?'),
     AI_TANK_RIGHT('»'),
     AI_TANK_DOWN('¿'),
-    AI_TANK_LEFT('«');
+    AI_TANK_LEFT('«'),
+    ;
 
     public final char ch;
+    private final Elements[] hitOptions;
     int power;
 
     private static List<Elements> result = null;
+
     public static Collection<Elements> getConstructions() {
         if (result == null) {
             result = Arrays.stream(values())
@@ -89,19 +99,28 @@ public enum Elements implements CharElements {
         return result;
     }
 
+    private static Multimap<Elements, Elements> constructionHits = ImmutableMultimap.<Elements, Elements>builder()
+            .put(CONSTRUCTION, CONSTRUCTION_DESTROYED_DOWN)
+            .put(CONSTRUCTION, CONSTRUCTION_DESTROYED_RIGHT)
+            .put(CONSTRUCTION, CONSTRUCTION_DESTROYED_UP)
+            .put(CONSTRUCTION, CONSTRUCTION_DESTROYED_LEFT)
+            .build();
+
+
     @Override
     public char ch() {
         return ch;
     }
 
     Elements(char ch) {
-        this.ch = ch;
-        this.power = -1;
+        this(ch, -1);
+
     }
 
-    Elements(char ch, int power) {
+    Elements(char ch, int power, Elements ... hitOptions) {
         this.ch = ch;
         this.power = power;
+        this.hitOptions = hitOptions;
     }
 
     @Override
@@ -116,5 +135,10 @@ public enum Elements implements CharElements {
             }
         }
         throw new IllegalArgumentException("No such element for " + ch);
+    }
+
+    public char shoot(Direction fromDirection) {
+        Collection<Elements> hitElements = constructionHits.get(this);
+        return hitElements.stream().filter((e) -> e.name().contains(fromDirection.inverted().name())).findFirst().orElse(NONE).ch();
     }
 }

@@ -357,7 +357,7 @@ public class BoardTest {
                 "☼☼☼☼☼☼");
         Board successor = board.createSuccessor(Direction.ACT);
 
-        assertEquals(Elements.BULLET, successor.getAt(1, 1));
+        assertEquals(Elements.CONSTRUCTION_DESTROYED_UP, successor.getAt(1, 2));
     }
 
 }

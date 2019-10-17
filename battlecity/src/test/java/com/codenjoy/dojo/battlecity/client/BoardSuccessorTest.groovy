@@ -81,7 +81,7 @@ class BoardSuccessorTest extends Specification {
         '☼☼☼☼☼☼|☼☼☼☼☼☼|' +
         '☼ ╬ ╬☼|☼ ╬ ╬☼|' +
         '☼    ☼|☼    ☼|' +
-        '☼˃• ╬☼|☼˃  •☼|' +
+        '☼˃• ╬☼|☼˃  ╠☼|' +
         '☼ ◄  ☼|☼ ◄  ☼|' +
         '☼☼☼☼☼☼|☼☼☼☼☼☼|'       || [STOP]  || 'bullet fired by other tank'
         '☼☼☼☼☼☼|☼☼☼☼☼☼|' +
@@ -120,6 +120,12 @@ class BoardSuccessorTest extends Specification {
         '☼   ╬☼|☼   ╬☼|' +
         '☼ ►? ☼|☼ ►  ☼|' +
         '☼☼☼☼☼☼|☼☼☼☼☼☼|'       || [ACT, STOP]  || 'bang disappears'
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|' +
+        '☼►╬ ╬☼|☼►╠ ╬☼|' +
+        '☼    ☼|☼    ☼|' +
+        '☼   ╬☼|☼   ╬☼|' +
+        '☼    ☼|☼    ☼|' +
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|'       || [ACT]  || 'my bullet damage wall'
     }
 
     @Unroll
@@ -142,6 +148,12 @@ class BoardSuccessorTest extends Specification {
         '☼   ╬☼|☼   ╬☼|' +
         '☼    ☼|☼    ☼|' +
         '☼☼☼☼☼☼|☼☼☼☼☼☼|'       || [ACT]  || Elements.AI_TANK_LEFT
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|' +
+        '☼ ╬ ╬☼|☼ ╬ ╬☼|' +
+        '☼ «  ☼|☼    ☼|' +
+        '☼►  ╬☼|☼►  ╠☼|' +
+        '☼    ☼|☼    ☼|' +
+        '☼☼☼☼☼☼|☼☼☼☼☼☼|'       || [ACT, STOP]  || Elements.CONSTRUCTION
     }
 
     private List calculateBoardString(String initialExpectedBoards, List<Direction> actions) {
